@@ -1,24 +1,44 @@
 'use client';
-import React, { use } from 'react'
-import { useEffect, useState } from 'react';
-import { fetchArtist} from '../fetch/fetchData'
-import Style from './style/Artist.module.css'
-import { GrLinkNext } from "react-icons/gr";
-import { GrLinkPrevious } from "react-icons/gr";
+import React, { useEffect, useState } from 'react';
+import { fetchArtist } from '../fetch/fetchData';
+import Style from './style/Artist.module.css';
+import { GrLinkNext, GrLinkPrevious } from "react-icons/gr";
 
 export default function Artist() {
-    const [artist, setArtist] = useState(0);
+    const [artist, setArtist] = useState([]); // Initialize as an empty array
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(); 
 
     useEffect(() => {
-        const loadArtist = async () =>
+        const loadArtist = async () => {
+          try {
+            const artist = await fetchArtist();
+            setArtist(artist);
+            console.log(artist)
+          } catch (error) {
+            setError(error.message);
+          }
+        };
+        loadArtist();
+    }, []); 
 
-
-
-            F
-    })
-  return (
-    <div>Artist</div>
-  )
+    return (
+        <div className={Style['container-all']}>
+            <div className={Style['container-content']}>
+                <button className={Style['button-prev-style']}>
+                    <GrLinkPrevious />
+                </button>  
+                {artist.map((artist, index) => (
+                    <div key={index} className={Style['Artist-container']}>
+                        <img src={artist.picture} alt={artist.name} className={Style['artist-image']} />
+                        <p>{artist.name}</p>
+                        <p>{artist.age}</p>
+                    </div>
+                ))}
+                 <button className={Style['button-next-style']}>
+                    <GrLinkNext />
+                </button>  
+            </div>
+        </div>
+    );
 }

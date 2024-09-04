@@ -34,10 +34,13 @@ export default function Navbar() {
             <li>
               <a className="justify-between">
                 Profile
-                <span className="badge">New</span>
               </a>
             </li>
-       
+            <li>
+              <a className="justify-between">
+                Settings
+              </a>
+            </li>
             <li>
               <a>Logout</a>
             </li>

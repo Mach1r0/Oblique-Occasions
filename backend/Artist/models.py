@@ -10,6 +10,7 @@ class Artist(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='artist_profile')
     bio = models.TextField()
+    age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(choices=GENDER, default='male', max_length=6, null=True, blank=True)
 
     def __str__(self):
