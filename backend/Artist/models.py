@@ -7,6 +7,7 @@ class Artist(models.Model):
         ('female', "Female"),
         ("other", "Other")
     ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='artist_profile')
     bio = models.TextField()
     gender = models.CharField(choices=GENDER, default='male', max_length=6, null=True, blank=True)

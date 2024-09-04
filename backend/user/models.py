@@ -44,7 +44,7 @@ class User(AbstractUser):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.username)
         super().save(*args, **kwargs)
 
         
