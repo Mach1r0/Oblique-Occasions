@@ -20,7 +20,8 @@ export default function Page() {
   }, []);
 
   return (
-    <div className={styles["container-all"]}>
+    <div className={styles['container-all']}>
+    <div className={styles["container-content"]}>
       {error && <p className={styles.error}>{error}</p>}
       <div className={styles["album-grid"]}>
         {albums.map((album: any, index: number) => (
@@ -35,6 +36,7 @@ export default function Page() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
