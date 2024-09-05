@@ -14,10 +14,12 @@ router.register(r'artists', ArtistViewSet, basename='artists')
 router.register(r'genrers', GenrerViewSet, basename='genrers')
 router.register(r'albums', AlbumViewSet, basename='albums')
 router.register(r'users', UserViewSet, basename='users')
-router.register(r'track', TrackViewSet, basename='track' )
+router.register(r'track', TrackViewSet, basename='track')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/user/', include('user.urls')),
+    path('api/artists/<str:artist_name>/albums/', AlbumViewSet.as_view({'get': 'list'}), name='artist-albums'),
+    path('api/albums/name/<str:album_name>/', AlbumViewSet.as_view({'get': 'retrieve_by_name'}), name='album-detail-by-name'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
