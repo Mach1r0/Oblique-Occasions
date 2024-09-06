@@ -71,18 +71,21 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    picture = serializers.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = [ 'name', 'picture', 'username', 'email', 'date_joined', 'is_active', 'picture', 'slug', 'password']
-        read_only_fields = [ 'date_joined', 'slug']
+        fields = ['name', 'picture', 'username', 'email', 'date_joined', 'is_active', 'slug', 'password']
+        read_only_fields = ['date_joined', 'slug']
 
     def create(self, validated_data):
+        picture = validated_data.pop('picture', None)
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             name=validated_data['name'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            picture=picture  # Add this line
         )
         return user
 
@@ -90,6 +93,8 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
+        if 'picture' in validated_data:
+            instance.picture = validated_data.pop('picture')
         return super().update(instance, validated_data)
 
 class SuperUserSerializer(serializers.ModelSerializer):

@@ -4,7 +4,7 @@ from core.models import DefaultModel
 from django.utils.text import slugify
 
 class UserManager(BaseUserManager):
-    def create_user(self, name, email, username, password = None, **extra_fields):
+    def create_user(self, name, email, username, password=None, **extra_fields):
         if not email:
             raise ValueError('Email field must be set')
         email = self.normalize_email(email)

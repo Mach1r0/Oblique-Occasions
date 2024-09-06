@@ -29,5 +29,7 @@
 
 .Container-artist{
     display: flex;
-    height: 450px;
+    height: 550px;
+    width: 100%;
+    background-color: green;
 }

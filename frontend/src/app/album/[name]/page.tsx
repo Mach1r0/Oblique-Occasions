@@ -29,7 +29,7 @@ export default function AlbumPage() {
         <div>
             <h1>{album.title}</h1>
             <img src={album.picture} alt={album.title} />
-            <p>Artist: {album.Artist}</p>
+            <p>Artist: {album.artist_name}</p>
             <p>Price: ${album.price}</p>
             <p>Release Date: {new Date(album.ReleaseDate).toLocaleDateString()}</p>
             <p>Bio: {album.bio}</p>
