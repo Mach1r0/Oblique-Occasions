@@ -59,3 +59,9 @@ class AlbumViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
+
+    def list_by_artist(self, request, username=None):
+        artist = get_object_or_404(Artist, user__username=username)
+        albums = Album.objects.filter(artist=artist)
+        serializer = self.get_serializer(albums, many=True)
+        return Response(serializer.data)
