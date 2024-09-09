@@ -14,10 +14,10 @@ export default function Header() {
             className={styles.HeaderImage}
           />
           <div className={styles.imageText}>
-            <h2>Essential Releases, August 30, 2024</h2>
             <Link href="/">
-              <p>Shoegaze, techno, indie psychedelia, and more.</p>
+            <h2>Essential Releases, August 30, 2024</h2>
             </Link>
+              <p>Shoegaze, techno, indie psychedelia, and more.</p>
           </div>
         </div>
         <div className={styles.ContainerImgSec}>

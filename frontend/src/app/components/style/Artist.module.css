@@ -1,7 +1,6 @@
 .container-all {
   padding: 2rem;
   width: 100%;
-  background-color: #1a1a1a;
 }
 
 .container-content {
@@ -16,14 +15,13 @@
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s ease;
-  background-color: #2a2a2a;
   padding: 1.5rem;
   border-radius: 10px;
 }
 
 .Artist-container:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(128, 0, 128, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 .Artist-container img {
@@ -32,7 +30,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
-  border: 3px solid #800080;
+  border: 2px solid #949494;
 }
 
 .Artist-container p {
@@ -43,9 +41,9 @@
 
 .button-prev-style,
 .button-next-style {
-  background-color: #800080;
+  background-color: #ffffff;
   border: none;
-  color: #ffffff;
+  color: black;
   padding: 0.5rem 1rem;
   cursor: pointer;
   border-radius: 5px;
@@ -54,7 +52,8 @@
 
 .button-prev-style:hover,
 .button-next-style:hover {
-  background-color: #9900cc;
+  background-color: #000000;
+  color: #ffff;
 }
 
 .button-prev-style:disabled,

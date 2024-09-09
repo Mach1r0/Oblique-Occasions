@@ -1,51 +1,47 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { fetchArtist } from '../fetch/fetchData';
+import { fetchArtists } from '../fetch/fetchData';
 import Style from './style/Artist.module.css';
 import { GrLinkNext, GrLinkPrevious } from "react-icons/gr";
 import Link from 'next/link'
 
 export default function Artist() {
-    const [artists, setArtists] = useState([]); 
+    const [artists, setArtists] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 4;
 
     useEffect(() => {
         const loadArtists = async () => {
-          try {
-            const fetchedData = await fetchArtist();
-            console.log('Fetched data:', fetchedData);
-            
-            let artistsArray;
-            if (Array.isArray(fetchedData)) {
-              artistsArray = fetchedData;
-            } else if (fetchedData.results && Array.isArray(fetchedData.results)) {
-              artistsArray = fetchedData.results;
-            } else {
-              throw new Error('Unexpected data structure');
+            try {
+                const fetchedData = await fetchArtists();
+                console.log('Fetched artists data:', fetchedData);
+                
+                let artistsArray;
+                if (Array.isArray(fetchedData)) {
+                    artistsArray = fetchedData;
+                } else if (fetchedData.results && Array.isArray(fetchedData.results)) {
+                    artistsArray = fetchedData.results;
+                } else {
+                    throw new Error('Unexpected data structure');
+                }
+                
+                setArtists(artistsArray.slice(0, 10)); // Limit to 10 artists
+            } catch (error) {
+                setError(error.message);
+                console.error('Error fetching artists:', error);
             }
-            
-            setArtists(artistsArray.slice(0, 10)); // Limit to 10 artists
-          } catch (error) {
-            setError(error.message);
-            console.error('Error fetching artists:', error);
-          }
         };
         loadArtists();
     }, []); 
 
     const HandleNext = () => {
-        if ((currentPage + 1) * itemsPerPage < artists.length) {
-            setCurrentPage(prevPage => prevPage + 1);
-        }
-    }
+        setCurrentPage(prev => Math.min(prev + 1, Math.ceil(artists.length / itemsPerPage) - 1));
+    };
 
     const HandlePrev = () => {
-        if (currentPage > 0) {
-            setCurrentPage(prevPage => prevPage - 1); 
-        }
-    }
+        setCurrentPage(prev => Math.max(prev - 1, 0));
+    };
 
     const displayArtist = artists.slice(
         currentPage * itemsPerPage, 
@@ -62,14 +58,17 @@ export default function Artist() {
 
     return (
         <div className={Style['container-all']}>
-            <h1 className={Style.title}>Artists</h1>
             <div className={Style['container-content']}>
                 <button onClick={HandlePrev} className={Style['button-prev-style']} disabled={currentPage === 0}>
                     <GrLinkPrevious />
                 </button>  
                 {displayArtist.map((artist, index) => (
                     <div key={index} className={Style['Artist-container']}>
-                        <img src={artist.picture} alt={artist.name} className={Style['artist-image']} />
+                        <img 
+                            src={artist.picture ? artist.picture : '/default-artist-image.jpg'} 
+                            alt={artist.name} 
+                            className={Style['artist-image']} 
+                        />
                         <Link href={`/artist/${artist.slug}`}>
                             <p>{artist.name}</p>
                         </Link>

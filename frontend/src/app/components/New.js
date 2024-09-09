@@ -42,7 +42,6 @@ export default function New() {
 
   return (
     <div className={Style.container}>
-      <h2>Newest Albums</h2>
       <ul className={Style.albumList}>
       <button
             className={Style['button-prev-style']}

@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #000000;
+    /* background-color: #000000; */
     padding: 3rem;
 }
 
@@ -10,11 +10,11 @@
 .container-selling,
 .Container-upcoming,
 .Container-artist {
-    background-color: #111111;
+    /* background-color: #111111; */
     padding: 4rem;
     margin-bottom: 4rem;
     border-radius: 20px;
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+    /* box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); */
 }
 
 .section-title {

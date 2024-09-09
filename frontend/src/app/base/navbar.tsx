@@ -7,9 +7,9 @@ export default function Navbar() {
   const { user, logout, token } = useAuth();
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-background-color">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl" href="/"> OBLIQUE OCCASIONS </a>
+        <a className="btn btn-ghost text-xl text-white" href="/"> OBLIQUE OCCASIONS </a>
       </div>
       <div className="flex-none gap-2">
         <div className="form-control">
@@ -34,7 +34,7 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <Link href="/login" className="btn btn-ghost">
+            <Link href="/login" className="btn btn-ghost text-white">
               Login
             </Link>
           )}

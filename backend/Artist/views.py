@@ -11,11 +11,21 @@ from Album.serializer import AlbumSerializer
 class ArtistViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
-    lookup_field = 'slug'  # Add this line
+    lookup_field = 'slug'
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
     def albums(self, request, slug=None):
         artist = self.get_object()
         albums = Album.objects.filter(Artist=artist)
-        serializer = AlbumSerializer(albums, many=True)
+        serializer = AlbumSerializer(albums, many=True, context={'request': request})
         return Response(serializer.data)

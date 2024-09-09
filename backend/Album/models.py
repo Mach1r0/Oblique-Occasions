@@ -8,11 +8,11 @@ class Album(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)
     ReleaseDate = models.DateTimeField(default=timezone.now)
     price = models.FloatField()
-    Artist = models.ForeignKey(Artist, on_delete=models.CASCADE, blank=False, null=False)
+    Artist = models.ForeignKey(Artist, on_delete=models.CASCADE, blank=False, null=False, related_name='albums')    
     genres = models.ManyToManyField(Genrer, blank=True) 
     picture = models.ImageField(upload_to='albums-img/', null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
-    slug = models.SlugField(unique=True, max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -20,4 +20,10 @@ class Album(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        if Album.objects.filter(slug=self.slug).exists():
+            # If the slug already exists, append a number to make it unique
+            count = 1
+            while Album.objects.filter(slug=f"{self.slug}-{count}").exists():
+                count += 1
+            self.slug = f"{self.slug}-{count}"
         super().save(*args, **kwargs)

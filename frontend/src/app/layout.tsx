@@ -5,17 +5,27 @@ import Navbar from "./base/navbar";
 import Footer from "./base/footer"
 import { AuthProvider } from './Context/AuthContext'
 
-const Layout = ({ children }: { children: React.ReactNode }) =>  {
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Your App Name",
+  description: "Your app description",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" data-theme="dark">
+      <body className={inter.className}>
         <AuthProvider>
           <Navbar />
-          {children}
+          <main>{children}</main>
           <Footer />
-      </AuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
-export default Layout;

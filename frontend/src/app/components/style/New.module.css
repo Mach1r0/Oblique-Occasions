@@ -3,7 +3,6 @@
     flex-direction: column;
     align-items: center;
     padding: 2rem;
-    background-color: var(--secondary-color);
 }
 
 .albumList {
@@ -40,6 +39,9 @@
     margin: 0;
     font-size: 1.2rem;
     text-align: center;
+    color: rgb(158, 158, 158);
+    font-weight: 600;
+    font-family: 'inter', sans-serif; 
 }
 
 .albumItem p {

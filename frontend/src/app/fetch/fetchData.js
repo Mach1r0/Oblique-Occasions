@@ -13,19 +13,14 @@ export async function fetchAlbums() {
   }
 }
 
-export async function fetchArtist(artistSlug = '') {
+export async function fetchArtist(artistSlug) {
   try {
-    let url = 'http://localhost:8000/api/artists/';
-    if (artistSlug) {
-      url += `${artistSlug}/`;
-    }
-    const response = await fetch(url);
+    const response = await fetch(`http://localhost:8000/api/artists/${artistSlug}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
     console.log("Fetched artist data:", data);
-    // Return the data as is, without assuming any structure
     return data;
   } catch (error) {
     console.error("Error fetching artist:", error);
@@ -56,10 +51,25 @@ export async function fetchAlbum(albumName) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
-    console.log("Fetched album data:", data);
+    console.log("Fetched album data:", JSON.stringify(data, null, 2));  
     return data;
   } catch (error) {
     console.error("Error fetching album:", error);
+    throw error;
+  }
+}
+
+export async function fetchArtists() {
+  try {
+    const response = await fetch(`http://localhost:8000/api/artists/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("Fetched artists data:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching artists:", error);
     throw error;
   }
 }

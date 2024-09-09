@@ -4,7 +4,7 @@ import { fetchAlbums } from '../fetch/fetchData';
 import styles from './style/Selling.module.css';
 import { GrLinkNext } from "react-icons/gr";
 import { GrLinkPrevious } from "react-icons/gr";
-
+import Link from 'next/link'
 
 export default function Selling() {
   const [albums, setAlbums] = useState([]);
@@ -45,7 +45,6 @@ export default function Selling() {
 
   return (
     <div className={styles.containerAll}>
-      <h1>Selling Right Now </h1>
       {error ? (
         <p>{error}</p>
       ) : (
@@ -61,9 +60,11 @@ export default function Selling() {
             <div key={index} className={styles.albumContainer}>
               <img src={album.picture} alt={album.name} className={styles.albumImage} />
               <div className={styles.albumText}>
-                <h2>{album.title} </h2>
+                <Link href={`/album/${encodeURIComponent(album.title.replace(/ /g, '-'))}`}>
+                  <h2>{album.title}</h2>
+                </Link>
                 <p>sold for €{album.price} </p>
-                <p>by {album.Artist} </p>
+                <p>by {album.artist_name} </p>
               </div>
             </div>
           ))}

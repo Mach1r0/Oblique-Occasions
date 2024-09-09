@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .containerAll{
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 0; /* Remove padding as it's now handled by the parent container */
+    padding: 0; 
     align-items: center;
     justify-content: center;
 }
@@ -32,7 +34,7 @@
 
 .containerContent{
     display: flex;
-    gap: 1.5rem; /* Adjust gap if needed */
+    gap: 1.5rem;
     align-items: center;
 }
 
@@ -52,9 +54,13 @@
 
 .albumText {
     text-align: center;
+    color: white;
 }
 
 .albumText h2 {
+    color: rgb(158, 158, 158);
+    font-weight: 600; 
+    font-family:'inter', sans-serif ;
     margin: 0;
     font-size: 1.2rem;
 }
@@ -66,9 +72,9 @@
 
 .button-prev-style,
 .button-next-style {
-    background-color: var(--primary-color);
+    background-color: white; 
     border: none;
-    color: var(--text-color);
+    color: black; 
     padding: 0.5rem 1rem;
     cursor: pointer;
     border-radius: 5px;
@@ -78,4 +84,10 @@
 .button-next-style:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.button-prev-style:hover,
+.button-next-style:hover {
+  background-color: #000000;
+  color: #ffff;
 }
