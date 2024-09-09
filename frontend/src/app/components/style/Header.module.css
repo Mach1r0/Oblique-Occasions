@@ -1,24 +1,25 @@
 .containerAll {
   width: 100%;
-  background-color: #121212;
-  padding: 1rem;
+  background-color: #000000;
+  padding: 2rem;
   box-sizing: border-box;
 }
 
 .containerContent {
   display: flex;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  gap: 1rem;
-  height: 300px;
+  gap: 2rem;
+  height: 500px;
 }
 
 .ContainerImgPrin {
-  flex: 2;
+  flex: 3;
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
 }
 
 .HeaderImage {
@@ -29,35 +30,37 @@
 
 .imageText {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
+  bottom: 30px;
+  left: 30px;
   color: white;
-  background-color: rgba(128, 0, 128, 0.7);
-  padding: 10px;
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 80%;
 }
 
 .imageText h2 {
-  font-size: 1.2rem;
-  margin-bottom: 5px;
+  font-size: 2rem;
+  margin-bottom: 10px;
 }
 
 .imageText p {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 
 .ContainerImgSec {
-  flex: 1;
+  flex: 2;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .imgSecItem {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  height: 50%;
+  border-radius: 15px;
+  height: calc(50% - 1rem);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
 }
 
 .imgSec {
@@ -68,11 +71,50 @@
 
 .textOverlay {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  bottom: 20px;
+  left: 20px;
   color: white;
-  background-color: rgba(128, 0, 128, 0.7);
-  padding: 5px;
-  font-size: 0.8rem;
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+@media (max-width: 1024px) {
+  .containerContent {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .ContainerImgPrin, .ContainerImgSec {
+    height: 400px;
+  }
+
+  .ContainerImgSec {
+    flex-direction: row;
+  }
+
+  .imgSecItem {
+    height: 100%;
+    width: calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .containerContent {
+    gap: 1rem;
+  }
+
+  .ContainerImgPrin, .ContainerImgSec, .imgSecItem {
+    height: 300px;
+  }
+
+  .imageText h2 {
+    font-size: 1.5rem;
+  }
+
+  .imageText p, .textOverlay {
+    font-size: 1rem;
+  }
 }
