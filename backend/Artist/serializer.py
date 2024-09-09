@@ -6,7 +6,8 @@ class ArtistSerializer(serializers.ModelSerializer):
     picture = serializers.ImageField(source='user.picture', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.CharField(source='user.email', read_only=True )
+    slug = serializers.SlugField(read_only=True)
 
     class Meta:
         model = Artist
-        fields = ['id', 'user', 'name', 'username', 'email', 'bio', 'gender', 'picture']
+        fields = ['id', 'user', 'name', 'username', 'email', 'bio', 'gender', 'picture', 'slug']

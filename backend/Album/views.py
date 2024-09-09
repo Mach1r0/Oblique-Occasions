@@ -52,8 +52,10 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='name/(?P<album_name>[\w-]+)')
     def retrieve_by_name(self, request, album_name=None):
-        album = get_object_or_404(Album, title__iexact=album_name.replace('-', ' '))
-        serializer = self.get_serializer(album)
+        albums = Album.objects.filter(title__iexact=album_name.replace('-', ' '))
+        if not albums.exists():
+            return Response({"detail": "No albums found with this name."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(albums, many=True)
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
@@ -61,6 +63,13 @@ class AlbumViewSet(viewsets.ModelViewSet):
         return self.update(request, *args, **kwargs)
 
     def list_by_artist(self, request, username=None):
+        artist = get_object_or_404(Artist, user__username=username)
+        albums = Album.objects.filter(artist=artist)
+        serializer = self.get_serializer(albums, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='artist/(?P<username>[\w-]+)')
+    def albums_by_artist(self, request, username=None):
         artist = get_object_or_404(Artist, user__username=username)
         albums = Album.objects.filter(artist=artist)
         serializer = self.get_serializer(albums, many=True)

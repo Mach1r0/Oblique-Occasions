@@ -1,14 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { fetchAlbums } from "../fetch/fetchData";
+import React from "react";
 import styles from "./style/Header.module.css";
 import Link from "next/link";
 
 export default function Header() {
-  const [albums, setAlbums] = useState([]);
-  const [error, setError] = useState(null);
-  const url = "@/public/a3339089756_16.jpg";
-
   return (
     <div className={styles.containerAll}>
       <div className={styles.containerContent}>

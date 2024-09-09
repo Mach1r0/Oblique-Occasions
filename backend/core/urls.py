@@ -20,6 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/user/', include('user.urls')),
-    path('api/artists/<str:artist_name>/albums/', AlbumViewSet.as_view({'get': 'list'}), name='artist-albums'),
-    path('api/albums/name/<str:album_name>/', AlbumViewSet.as_view({'get': 'retrieve_by_name'}), name='album-detail-by-name'),
+    path('api/artists/<slug:slug>/albums/', ArtistViewSet.as_view({'get': 'albums'}), name='artist-albums'),    path('api/albums/name/<str:album_name>/', AlbumViewSet.as_view({'get': 'retrieve_by_name'}), name='album-detail-by-name'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

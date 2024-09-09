@@ -39,8 +39,11 @@ class LoginView(APIView):
     permission_classes = [] 
 
     def post(self, request):
+        print("Received data:", request.data)  
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            print("Serializer errors:", serializer.errors)  
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
@@ -48,7 +51,7 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user is None:
-            raise AuthenticationFailed('User not found')
+            return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token

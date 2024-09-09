@@ -1,9 +1,65 @@
-.container{
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 2rem;
+    background-color: var(--secondary-color);
 }
 
-.albumList{
+.albumList {
     display: flex;
+    gap: 2rem;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+}
+
+.albumItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--background-color);
+    padding: 1rem;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.albumItem:hover {
+    transform: scale(1.05);
+}
+
+.albumItem img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.albumItem h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.albumItem p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.button-prev-style,
+.button-next-style {
+    background-color: var(--primary-color);
+    border: none;
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.button-prev-style:disabled,
+.button-next-style:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

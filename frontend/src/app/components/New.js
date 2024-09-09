@@ -4,6 +4,7 @@ import Style from "./style/New.module.css"
 import { fetchAlbums } from '../fetch/fetchData'
 import { GrLinkNext } from "react-icons/gr";
 import { GrLinkPrevious } from "react-icons/gr";
+import Link from 'next/link'
 
 export default function New() {
   const [albums, setAlbums] = useState([])
@@ -53,7 +54,9 @@ export default function New() {
         {displayAlbums.map((album) => (
           <li key={album.id} className={Style.albumItem}>
             <img src={album.picture} alt={album.title} />
+           <Link href={`/album/${album.slug}`}>
             <h3>{album.title}</h3>
+            </Link>
             <p>Release Date: {new Date(album.ReleaseDate).toLocaleDateString()}</p>
           </li>
         ))}

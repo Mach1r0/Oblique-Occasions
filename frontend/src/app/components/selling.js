@@ -45,6 +45,7 @@ export default function Selling() {
 
   return (
     <div className={styles.containerAll}>
+      <h1>Selling Right Now </h1>
       {error ? (
         <p>{error}</p>
       ) : (

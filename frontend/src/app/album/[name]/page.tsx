@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import React from 'react'
 import { fetchAlbum } from '@/app/fetch/fetchData';
 import { useParams } from 'next/navigation'
+import styles from '../../style/Album.module.css';
 
 export default function AlbumPage() {
     const [album, setAlbum] = useState(null)
@@ -22,17 +23,21 @@ export default function AlbumPage() {
         loadAlbum();
     }, [name]);
 
-    if (error) return <div>Error: {error}</div>;
-    if (!album) return <div>Loading...</div>;
+    if (error) return <div className={styles['album-container']}><p className={styles.error}>{error}</p></div>;
+    if (!album) return <div className={styles['album-container']}><p>Loading...</p></div>;
 
     return (
-        <div>
-            <h1>{album.title}</h1>
-            <img src={album.picture} alt={album.title} />
-            <p>Artist: {album.artist_name}</p>
-            <p>Price: ${album.price}</p>
-            <p>Release Date: {new Date(album.ReleaseDate).toLocaleDateString()}</p>
-            <p>Bio: {album.bio}</p>
+        <div className={styles['album-container']}>
+            <h1 className={styles['album-title']}>{album.title}</h1>
+            <div className={styles['album-content']}>
+                <img src={album.picture} alt={album.title} className={styles['album-image']} />
+                <div className={styles['album-info']}>
+                    <p><strong>Artist:</strong> {album.artist_name}</p>
+                    <p><strong>Price:</strong> ${album.price}</p>
+                    <p><strong>Release Date:</strong> {new Date(album.ReleaseDate).toLocaleDateString()}</p>
+                    <p className={styles['album-bio']}>{album.bio}</p>
+                </div>
+            </div>
         </div>
     )
 }
