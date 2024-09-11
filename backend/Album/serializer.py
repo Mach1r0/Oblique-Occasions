@@ -6,6 +6,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     artist_name = serializers.SerializerMethodField()
     artist_slug = serializers.SerializerMethodField()
     slug = serializers.SlugField(read_only=True)
+    genres = serializers.SerializerMethodField()  # Change this line
 
     class Meta:
         model = Album
@@ -16,6 +17,9 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     def get_artist_slug(self, obj):
         return obj.Artist.slug if obj.Artist else None
+
+    def get_genres(self, obj):
+        return [genre.name for genre in obj.genres.all()]  
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

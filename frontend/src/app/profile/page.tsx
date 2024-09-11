@@ -6,7 +6,9 @@ export default function Profile() {
   const { user } = useAuth();
   
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>
+        <h1 className='flex flex-col h-screen  text-4xl	items-center 	justify-center text-blue-500'> You need Log in to show the profile page</h1>
+    </div>;
   }
 
   return (

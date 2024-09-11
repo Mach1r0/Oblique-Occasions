@@ -7,10 +7,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User  
+from .models import User, Follow
 import logging, datetime
 from .serializer import UserSerializer, RegisterSerializer, LoginSerializer
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  
@@ -70,6 +71,68 @@ class LoginView(APIView):
             'user': user_data
         }, status=status.HTTP_200_OK)
 
+class UpdateUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        print("Received data:", request.data)
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        logger.info(f"User {request.user.username} is trying to follow user with ID {user_id}")
+        try:
+            if user_id == request.user_id:
+                return Response({"message": "You can't follow yourself"}, status=status.HTTP_400_BAD_REQUEST)
+            following_user = User.objects.filter(id=user_id).first()
+            follow, created = Follow.objects.get_or_create(follower=request.user, following=following_user)
+            if created:
+                return Response({"message": f"You are now following {following_user.username}"}, status=status.HTTP_201_CREATED)
+            return Response({"message": f'You are already following {following_user.username}'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class UserFollowingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            following = Follow.objects.filter(following=request.user)
+            following_list = [following.follower for following in following]
+            return Response(following_list, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({})
+
+class UserFollowersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            followers = Follow.objects.filter(folowing_id=user_id)
+            followers_list = [followers.follower for followers in followers]
+            return Response(followers_list, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message": "User does exist"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class UnfollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, user_id):
+        try:
+            follow = Follow.objects.get(follower=request.user, following_id=user_id)
+            follow.delete()
+            return Response({"message": "Unfollowed successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Follow.DoesNotExist:
+            return Response({"message": "You are not following this user"}, status=status.HTTP_400_BAD_REQUEST)
+        
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     permission_classes = [AllowAny]

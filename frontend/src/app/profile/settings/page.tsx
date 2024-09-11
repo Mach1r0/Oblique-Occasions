@@ -11,9 +11,10 @@ export default function Profile() {
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>
+        <h1 className='flex flex-col h-screen  text-4xl	items-center 	justify-center text-blue-500'> You need Log in to show the settings page</h1>
+    </div>;
   }
-
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -107,6 +108,9 @@ export default function Profile() {
               )}
             </div>
           </form>
+          <div className="flex ">
+              <p> You wanna change password?</p>
+          </div>
           <button className="bg-blue-500 text-white rounded-md p-2 mt-6 w-full">
             Update
           </button>
