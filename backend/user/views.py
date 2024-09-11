@@ -59,9 +59,9 @@ class LoginView(APIView):
         user_data = {
             'id': user.id,
             'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email
+            'name': user.name,
+            'email': user.email,
+            'slug': user.slug 
         }
         
         return Response({
