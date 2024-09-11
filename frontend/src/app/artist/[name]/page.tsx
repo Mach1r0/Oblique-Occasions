@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchArtistAlbums, fetchArtist } from "../../fetch/fetchData";
+import { fetchArtistAlbums, fetchArtist, followArtist } from "../../fetch/fetchData";
 import styles from "../../style/ArtistDetail.module.css";
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -31,6 +31,15 @@ export default function ArtistPage() {
   if (error) return <div className={styles.error}>{error}</div>;
   if (!artist) return <div className={styles.loading}>Loading...</div>;
 
+  const handleFollow = async () => {
+    try {
+      await followArtist(artist.id);
+      alert(`You are now following ${artist.name}`);
+    } catch (error) {
+      alert("Failed to follow artist. Please try again.");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.mainContent}>
@@ -56,7 +65,7 @@ export default function ArtistPage() {
         <h2 className={styles.artistName}>{artist.name}</h2>
         <p className={styles.artistLocation}>{artist.location}</p>
         <p className={styles.artistBio}>{artist.bio}</p>
-        <button className={styles.followButton}>Follow</button>
+        <button className={styles.followButton} onClick={handleFollow}>Follow</button>
         <div className={styles.socialLinks}>
           <a href="#" className={styles.socialLink}>SoundCloud</a>
           <a href="#" className={styles.socialLink}>Twitter</a>

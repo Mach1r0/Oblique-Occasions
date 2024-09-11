@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import permissions, viewsets, status
 from rest_framework.permissions import AllowAny
+from Artist.models import Artist  # Adjust the import based on your project structure
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
@@ -9,7 +10,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Follow
 import logging, datetime
-from .serializer import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializer import UserSerializer, RegisterSerializer, LoginSerializer, FollowSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 
@@ -99,12 +100,17 @@ class FollowUserView(APIView):
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+
 class UserFollowingView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, user_id):
         try:
-            following = Follow.objects.filter(following=request.user)
+            user = User.objects.get(id=user_id)
+            following = Follow.objects.filter(following=user)
             following_list = [following.follower for following in following]
             return Response(following_list, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -147,3 +153,17 @@ class RegisterView(APIView):
                 "message": "User Created Successfully.",
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FollowArtistView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, artist_id):
+        try:
+            artist = Artist.objects.get(id=artist_id)
+            follow, created = Follow.objects.get_or_create(follower=request.user, following=artist)
+            if created:
+                return Response({"message": f"You are now following {artist.name}"}, status=status.HTTP_201_CREATED)
+            return Response({"message": f'You are already following {artist.name}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Artist.DoesNotExist:
+            return Response({"message": "Artist not found"}, status=status.HTTP_404_NOT_FOUND)

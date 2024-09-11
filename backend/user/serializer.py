@@ -103,6 +103,11 @@ class UserSerializer(serializers.ModelSerializer):
             instance.picture = validated_data.pop('picture')
         return super().update(instance, validated_data)
 
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow 
+        fields = ['id', 'follower', 'following', 'created_at']
+
 class SuperUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

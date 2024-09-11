@@ -73,3 +73,24 @@ export async function fetchArtists() {
     throw error;
   }
 }
+
+export async function followArtist(artistId) {
+  try {
+    const response = await fetch(`http://localhost:8000/api/user/follow/artist/${artistId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`  // Adjust based on your auth setup
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("Followed artist:", data);
+    return data;
+  } catch (error) {
+    console.error("Error following artist:", error);
+    throw error;
+  }
+}

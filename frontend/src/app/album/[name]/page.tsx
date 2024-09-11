@@ -18,7 +18,7 @@ export default function AlbumPage() {
                 const fetchedAlbums = await fetchAlbum(name);
                 if (fetchedAlbums.length > 0) {
                     const fetchedAlbum = fetchedAlbums[0];
-                    console.log("Fetched album:", fetchedAlbum);  // Add this line for debugging
+                    console.log("Fetched album:", fetchedAlbum); 
                     setAlbum(fetchedAlbum);
                     if (fetchedAlbum.artist_slug) {
                         const fetchedArtist = await fetchArtist(fetchedAlbum.artist_slug);

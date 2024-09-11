@@ -53,7 +53,7 @@ export default function New() {
         {displayAlbums.map((album) => (
           <li key={album.id} className={Style.albumItem}>
             <img src={album.picture} alt={album.title} />
-           <Link href={`/album/${album.slug}`}>
+            <Link href={`/album/${encodeURIComponent(album.title.replace(/ /g, '-'))}`}>
             <h3>{album.title}</h3>
             </Link>
             <p>Release Date: {new Date(album.ReleaseDate).toLocaleDateString()}</p>
