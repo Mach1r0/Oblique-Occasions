@@ -87,6 +87,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const update = async (updatedData) => {
+        const token = localStorage.getItem("token");
+        const formData = new FormData();
+    
+        for (const key in updatedData) {
+            formData.append(key, updatedData[key]);
+        }
+    
+        try {
+            const response = await fetch("http://localhost:8000/api/user/update/", {
+                method: "PUT", // Use PUT method
+                headers: {
+                    "Authorization": `Bearer ${token}`, // Include the token in the Authorization header
+                },
+                body: formData,
+            });
+    
+            // Handle the response if needed
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Update successful:", data);
+            } else {
+                console.error("Update failed:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -96,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, signUp, error, logout }}>
+        <AuthContext.Provider value={{ user, token, login, signUp, error, logout, update }}>
             {isReady ? children : "Loading..."}
         </AuthContext.Provider>
     );

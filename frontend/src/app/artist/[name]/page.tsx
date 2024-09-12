@@ -1,13 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchArtistAlbums, fetchArtist, followArtist } from "../../fetch/fetchData";
+import { fetchArtistAlbums, fetchArtist, followArtist, checkFollowStatus } from "../../fetch/fetchData";
 import styles from "../../style/ArtistDetail.module.css";
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import axios from 'axios';
 
 export default function ArtistPage() {
   const [albums, setAlbums] = useState([]);
   const [artist, setArtist] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [error, setError] = useState(null);
   const params = useParams();
   const name = params.name as string;
@@ -19,6 +21,8 @@ export default function ArtistPage() {
         setArtist(fetchedArtist);
         const fetchedAlbums = await fetchArtistAlbums(name);
         setAlbums(fetchedAlbums);
+        const followStatus = await checkFollowStatus(fetchedArtist.id);
+        setIsFollowing(followStatus.is_following);
       } catch (error) {
         setError("Failed to load data. Please try again");
       }
@@ -32,11 +36,59 @@ export default function ArtistPage() {
   if (!artist) return <div className={styles.loading}>Loading...</div>;
 
   const handleFollow = async () => {
+    console.log('Follow button clicked'); // Debugging statement
     try {
-      await followArtist(artist.id);
-      alert(`You are now following ${artist.name}`);
+      const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+      console.log('token:', token); // Debugging statement
+      if (!token) {
+        alert('You need to be logged in to follow an artist.');
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/user/follow/${artist.id}/`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      alert(response.data.message);
+      setIsFollowing(true);
     } catch (error) {
-      alert("Failed to follow artist. Please try again.");
+      console.error('Error following artist:', error);
+      alert('An error occurred while trying to follow the artist.');
+    }
+  };
+
+  const handleUnfollow = async () => {
+    console.log('Unfollow button clicked'); // Debugging statement
+    try {
+      const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+      console.log('token:', token); // Debugging statement
+      if (!token) {
+        alert('You need to be logged in to unfollow an artist.');
+        return;
+      }
+
+      const response = await axios.delete(
+        `http://localhost:8000/api/user/unfollow/${artist.id}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      alert(response.data.message);
+      setIsFollowing(false);
+    } catch (error) {
+      console.error('Error unfollowing artist:', error);
+      alert('An error occurred while trying to unfollow the artist.');
     }
   };
 
@@ -65,7 +117,11 @@ export default function ArtistPage() {
         <h2 className={styles.artistName}>{artist.name}</h2>
         <p className={styles.artistLocation}>{artist.location}</p>
         <p className={styles.artistBio}>{artist.bio}</p>
-        <button className={styles.followButton} onClick={handleFollow}>Follow</button>
+        {isFollowing ? (
+          <button className={styles.followButton} onClick={handleUnfollow}>Unfollow</button>
+        ) : (
+          <button className={styles.followButton} onClick={handleFollow}>Follow</button>
+        )}
         <div className={styles.socialLinks}>
           <a href="#" className={styles.socialLink}>SoundCloud</a>
           <a href="#" className={styles.socialLink}>Twitter</a>

@@ -13,6 +13,19 @@ export async function fetchAlbums() {
   }
 }
 
+import axios from 'axios';
+
+export const checkFollowStatus = async (userId) => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`http://localhost:8000/api/user/check-follow-status/${userId}/`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data;
+};
+
 export async function fetchArtist(artistSlug) {
   try {
     const response = await fetch(`http://localhost:8000/api/artists/${artistSlug}/`);

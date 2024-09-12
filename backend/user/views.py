@@ -71,7 +71,14 @@ class LoginView(APIView):
             'access': str(access),
             'user': user_data
         }, status=status.HTTP_200_OK)
+    
+class CheckFollowStatusView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, user_id):
+        is_following = Follow.objects.filter(follower=request.user, following_id=user_id).exists()
+        return Response({"is_following": is_following}, status=status.HTTP_200_OK)
+    
 class UpdateUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -80,19 +87,26 @@ class UpdateUserView(APIView):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
+            print("Serializer is valid")
             serializer.save()
+            print("User updated:", serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print("Serializer errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
     
 class FollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
+        logger.info(f"Request headers: {request.headers}")
         logger.info(f"User {request.user.username} is trying to follow user with ID {user_id}")
         try:
-            if user_id == request.user_id:
+            if user_id == request.user.id:
                 return Response({"message": "You can't follow yourself"}, status=status.HTTP_400_BAD_REQUEST)
             following_user = User.objects.filter(id=user_id).first()
+            if not following_user:
+                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
             follow, created = Follow.objects.get_or_create(follower=request.user, following=following_user)
             if created:
                 return Response({"message": f"You are now following {following_user.username}"}, status=status.HTTP_201_CREATED)

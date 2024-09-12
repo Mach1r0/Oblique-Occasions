@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../Context/AuthContext";
 
 export default function Profile() {
+  const { update } = useAuth();
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
@@ -11,10 +12,15 @@ export default function Profile() {
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   if (!user) {
-    return <div>
-        <h1 className='flex flex-col h-screen  text-4xl	items-center 	justify-center text-blue-500'> You need Log in to show the settings page</h1>
-    </div>;
+    return (
+      <div>
+        <h1 className="flex flex-col h-screen text-4xl items-center justify-center text-blue-500">
+          You need to log in to show the settings page
+        </h1>
+      </div>
+    );
   }
+
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -35,13 +41,27 @@ export default function Profile() {
     }
   };
 
+  const handleUpdate = async () => {
+    const updatedData = {
+      name,
+    email,
+      username,
+    };
+  
+    if (picture) {
+      updatedData.picture = picture;
+    }
+  
+    await update(updatedData);
+  };
+
   return (
     <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-6 overflow-y-auto">
       <div className="flex flex-col items-center w-full max-w-md">
         <div className="flex flex-row items-center bg-white shadow-lg rounded-lg p-6 w-full mb-6">
           <div className="w-20 h-20 bg-black rounded-full overflow-hidden">
             <img
-              src={picture}
+              src={typeof picture === "string" ? picture : URL.createObjectURL(picture)}
               alt="Profile Picture"
               className="object-cover w-full h-full"
             />
@@ -52,12 +72,10 @@ export default function Profile() {
         </div>
 
         <div className="flex flex-col bg-white shadow-lg rounded-lg p-6 w-full">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Profile
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Profile</h2>
           <form className="flex flex-col gap-3 w-full">
             <div>
-              <label className="block mb-1"> Nome</label>
+              <label className="block mb-1">Name</label>
               <input
                 type="text"
                 name="name"
@@ -108,10 +126,13 @@ export default function Profile() {
               )}
             </div>
           </form>
-          <div className="flex ">
-              <p> You wanna change password?</p>
+          <div className="flex">
+            <p>Do you want to change the password?</p>
           </div>
-          <button className="bg-blue-500 text-white rounded-md p-2 mt-6 w-full">
+          <button
+            className="bg-blue-500 text-white rounded-md p-2 mt-6 w-full"
+            onClick={handleUpdate}
+          >
             Update
           </button>
         </div>

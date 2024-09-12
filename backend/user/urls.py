@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, UserViewSet, LoginView, UpdateUserView, FollowUserView, UnfollowUserView, UserFollowingView, UserFollowersView, FollowArtistView
+from .views import RegisterView, UserViewSet, LoginView, UpdateUserView, FollowUserView, UnfollowUserView, UserFollowingView, UserFollowersView, FollowArtistView, CheckFollowStatusView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -17,4 +17,5 @@ urlpatterns = [
     path('unfollow/<int:user_id>/', UnfollowUserView.as_view(), name='Unfollow'),
     path('following/', UserFollowingView.as_view(), name='UserFollowing'),  
     path('followers/<int:user_id>/', UserFollowersView.as_view(), name='UserFollowers'),
+    path('check-follow-status/<int:user_id>/', CheckFollowStatusView.as_view(), name='CheckFollowStatus'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -18,9 +18,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         total = kwargs['total']
         
-        # Create artists
         artists = []
-        for _ in range(total // 2):  # Create half as many artists as albums
+        for _ in range(total // 2):
             user = User.objects.create(
                 name=fake.name(),
                 username=fake.user_name(),
@@ -37,14 +36,13 @@ class Command(BaseCommand):
 
         # Create genres
         genres = []
-        for _ in range(5):  # Create 5 genres
+        for _ in range(5):  
             genre = Genrer.objects.create(
                 name=fake.word(),
                 description=fake.sentence()
             )
             genres.append(genre)
 
-        # Create albums
         for _ in range(total):
             album = Album.objects.create(
                 title=fake.sentence(nb_words=3),
@@ -53,7 +51,6 @@ class Command(BaseCommand):
                 Artist=random.choice(artists),
                 bio=fake.text()
             )
-            # Add random genres to the album
             album.genres.set(random.sample(genres, random.randint(1, 3)))
 
         self.stdout.write(self.style.SUCCESS(f'Successfully created {total} albums'))
