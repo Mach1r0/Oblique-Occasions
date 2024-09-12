@@ -1,13 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import React from 'react'
-import { fetchAlbum, fetchArtist } from '@/app/fetch/fetchData';
+import { fetchAlbum, fetchArtist, fetchArtistAlbums } from '@/app/fetch/fetchData';
 import { useParams } from 'next/navigation'
 import styles from '../../style/Album.module.css';
+import Link from 'next/link'; // Assuming Link is imported from next/link
 
 export default function AlbumPage() {
     const [album, setAlbum] = useState(null);
     const [artist, setArtist] = useState(null);
+    const [artistAlbums, setArtistAlbums] = useState([]); // State for artist's albums
     const [error, setError] = useState(null);
     const params = useParams()
     const name = params.name as string;
@@ -23,6 +25,9 @@ export default function AlbumPage() {
                     if (fetchedAlbum.artist_slug) {
                         const fetchedArtist = await fetchArtist(fetchedAlbum.artist_slug);
                         setArtist(fetchedArtist);
+                        // Fetch artist's albums
+                        const albums = await fetchArtistAlbums(fetchedAlbum.artist_slug);
+                        setArtistAlbums(albums.slice(0, 3)); // Get the first 3 albums
                     } else {
                         console.error("Artist slug is missing from album data");
                     }
@@ -66,12 +71,29 @@ export default function AlbumPage() {
                         <img src={artist.picture} alt={album.artist_name} className={styles['artist-image']} />
                     }
                     <div className={styles['social-links']}>
-                        {/* Add social media links here if available */}
-                        <p>Social links placeholder</p>
+                        {artist && artist.soundcloud && (  
+                            <Link href={artist.soundcloud}>
+                                <p>Soundcloud</p>
+                            </Link>
+                        )}
+                        {artist && artist.spotify && (
+                            <Link href={artist.spotify}>
+                                <p>Spotify</p>
+                            </Link>
+                        )}
                     </div>
                     <div className={styles['discography']}>
-                        {/* We don't have other albums information in the current data structure */}
-                        <p>Other albums not available</p>
+                        <h3>Related Albums</h3>
+                        {artistAlbums.length > 0 ? (
+                            artistAlbums.map((relatedAlbum) => (
+                                <div key={relatedAlbum.id} className={styles['related-album']}>
+                                    <img src={relatedAlbum.picture || '/default-album.jpg'} alt={relatedAlbum.title} className={styles['related-album-image']} />
+                                    <p>{relatedAlbum.title}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No related albums available</p>
+                        )}
                     </div>
                 </div>
             </div>

@@ -13,8 +13,6 @@ export async function fetchAlbums() {
   }
 }
 
-import axios from 'axios';
-
 export const checkFollowStatus = async (userId) => {
   const token = localStorage.getItem('token');
   const response = await axios.get(`http://localhost:8000/api/user/check-follow-status/${userId}/`, {
@@ -72,6 +70,48 @@ export async function fetchAlbum(albumName) {
   }
 }
 
+export async function FollwersList(userid){
+  try{
+    const response = await fetch(`http://localhost:8000/api/user/followers/${user.id}/`,{
+      method: 'GET',
+      headers: {
+        'Content-type': 'application',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    }) 
+    if (!response.ok){
+      throw error; 
+      console.log("Error on fetch followers", error)
+    }
+    const data = await response.json()
+    console.log("Fetching followers", data)
+    return data; 
+  } catch(error){
+    console.log("Error on fetch", error)
+  }
+}
+
+export async function FollowingList(userid){
+  try{
+    const response = await fetch(`http://localhost:8000/api/user/followers/${user.id}/`, {
+      method: 'GET', 
+      headers: {
+        'Content-Type': 'application',
+        'Authorization': `Bearer ${localStorage.getItem('token')}}`
+      }
+
+    });
+    if (!response.ok) {
+      throw error; 
+      console.log("Error fetching Follow", error)
+    }
+    const data = await response.json()
+    console.log("Fetching follow", data);
+  }catch (error){
+    console.log("error on fetch:", error)
+  }
+}
+
 export async function fetchArtists() {
   try {
     const response = await fetch(`http://localhost:8000/api/artists/`);
@@ -93,7 +133,7 @@ export async function followArtist(artistId) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`  // Adjust based on your auth setup
+        'Authorization': `Bearer ${localStorage.getItem('token')}`  
       }
     });
     if (!response.ok) {

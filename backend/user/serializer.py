@@ -12,7 +12,7 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Follow
         fields = ['follower', 'following', 'created_at']
-        read_only_fields = ['follower', 'created_at']
+    read_only_fields = ['follower', 'created_at']
 
 class RegisterSerializer(serializers.ModelSerializer): 
     email =  serializers.EmailField(required=True)

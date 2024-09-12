@@ -11,7 +11,12 @@ from Album.serializer import AlbumSerializer
 class ArtistViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
-    lookup_field = 'slug'
+    lookup_field = 'slug'  # Keep this if you want to use slug for other endpoints
+
+    def get_object(self):
+        if self.kwargs.get('id'):
+            return get_object_or_404(Artist, id=self.kwargs['id'])
+        return super().get_object()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

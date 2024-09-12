@@ -10,7 +10,7 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artist
-        fields = ['id', 'user', 'name', 'username', 'email', 'bio', 'gender', 'picture', 'slug']
+        fields = ['id', 'user', 'name', 'username', 'email', 'bio', 'gender', 'picture', 'slug', 'soundcloud', 'spotify']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

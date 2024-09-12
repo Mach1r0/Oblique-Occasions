@@ -14,6 +14,8 @@ class Artist(models.Model):
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(choices=GENDER, default='male', max_length=6, null=True, blank=True)
     slug = models.SlugField(unique=True, max_length=255)
+    soundcloud = models.URLField(null=True, blank=True)
+    spotify = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.user.name
