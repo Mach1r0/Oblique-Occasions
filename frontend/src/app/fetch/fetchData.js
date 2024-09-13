@@ -93,47 +93,48 @@ export async function fetchAlbum(albumName) {
   }
 }
 
-export async function FollwersList(userid){
-  try{
-    const response = await fetch(`http://localhost:8000/api/user/followers/${user.id}/`,{
+export async function FollowersList(userId) {
+  try {
+    const response = await fetch(`http://localhost:8000/api/user/followers/${userId}/`, {
       method: 'GET',
       headers: {
-        'Content-type': 'application',
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
-    }) 
-    if (!response.ok){
-      throw error; 
-      console.log("Error on fetch followers", error)
-    }
-    const data = await response.json()
-    console.log("Fetching followers", data)
-    return data; 
-  } catch(error){
-    console.log("Error on fetch", error)
-  }
-}
-
-export async function FollowingList(userid){
-  try{
-    const response = await fetch(`http://localhost:8000/api/user/followers/${user.id}/`, {
-      method: 'GET', 
-      headers: {
-        'Content-Type': 'application',
-        'Authorization': `Bearer ${localStorage.getItem('token')}}`
-      }
-
     });
     if (!response.ok) {
-      throw error; 
-      console.log("Error fetching Follow", error)
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json()
-    console.log("Fetching follow", data);
-  }catch (error){
-    console.log("error on fetch:", error)
+    const data = await response.json();
+    console.log("Fetching followers", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching followers:", error);
+    throw error;
   }
 }
+
+export async function FollowingList(userId) {
+  try {
+    const response = await fetch(`http://localhost:8000/api/user/following/${userId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("Fetching following", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching following:", error);
+    throw error;
+  }
+}
+
 
 export async function fetchArtists() {
   try {

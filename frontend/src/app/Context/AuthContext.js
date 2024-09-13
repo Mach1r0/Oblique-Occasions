@@ -92,7 +92,11 @@ export const AuthProvider = ({ children }) => {
         const formData = new FormData();
     
         for (const key in updatedData) {
-            formData.append(key, updatedData[key]);
+            if (key === 'picture' && updatedData[key] instanceof File) {
+                formData.append(key, updatedData[key], updatedData[key].name);
+            } else {
+                formData.append(key, updatedData[key]);
+            }
         }
     
         try {
@@ -109,8 +113,9 @@ export const AuthProvider = ({ children }) => {
                 setUser(data);  
                 return data; 
             } else {
-                console.error("Update failed:", response.statusText);
-                throw new Error(response.statusText);
+                const errorData = await response.json();
+                console.error("Update failed:", errorData);
+                throw new Error(errorData.detail || response.statusText);
             }
         } catch (error) {
             console.error("Error updating profile:", error);

@@ -6,6 +6,13 @@ import Link from "next/link";
 export default function Navbar() {
   const { user, logout, token } = useAuth();
 
+  const getFullImageUrl = (url) => {
+    if (url && !url.startsWith('http')) {
+      return `http://localhost:8000${url}`;
+    }
+    return url;
+  };
+
   return (
     <div className="navbar bg-background-color">
       <div className="flex-1">
@@ -28,21 +35,16 @@ export default function Navbar() {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              {user?.picture ? (
-                <div className="w-10 rounded-full">
-                  <img
-                    alt="User avatar"
-                    src={user.picture}
-                  />
-                </div>
-              ) : (
-                <div className="w-10 rounded-full">
-                  <img
-                    alt="Default avatar"
-                    src="img/img-default-perfil.png"
-                  />
-                </div>
-              )}
+              <div className="w-10 rounded-full">
+                <img
+                  alt="User avatar"
+                  src={user?.picture ? getFullImageUrl(user.picture) : "/img/img-default-perfil.png"}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/img/img-default-perfil.png";
+                  }}
+                />
+              </div>
             </div>
           ) : (
             <Link href="/login" className="btn btn-ghost text-white">
@@ -58,7 +60,7 @@ export default function Navbar() {
                 <Link href="/profile" className="justify-between">Profile</Link>
               </li>
               <li>
-                <Link href="/settings" className="justify-between">Settings</Link>
+                <Link href="/profile/settings" className="justify-between">Settings</Link>
               </li>
               <li>
                 <a onClick={logout}>Logout</a>

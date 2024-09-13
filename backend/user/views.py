@@ -63,7 +63,8 @@ class LoginView(APIView):
             'username': user.username,
             'name': user.name,
             'email': user.email,
-            'slug': user.slug 
+            'slug': user.slug,
+            'picture': user.picture.url if user.picture else None  
         }
         
         return Response({
@@ -127,10 +128,6 @@ class FollowArtistView(APIView):
         except Artist.DoesNotExist:
             return Response({"message": "Artist not found"}, status=status.HTTP_404_NOT_FOUND)
         
-import logging
-
-logger = logging.getLogger(__name__)
-
 class UnfollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -149,13 +146,18 @@ class UserFollowersView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
+        logger.info(f"Fetching followers for user with ID: {user_id}")
         try:
             user = User.objects.get(id=user_id)
-            followers = Follow.objects.filter(folowing_id=user_id)
-            followers_list = [followers.follower for followers in followers]
+            followers = Follow.objects.filter(following=user)
+            followers_list = [follow.follower.username for follow in followers]
+            logger.info(f"Followers retrieved: {followers_list}")
             return Response(followers_list, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({"message": "User does exist"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"User with ID {user_id} not found")
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
         
 class UserFollowingView(APIView):
     permission_classes = [IsAuthenticated]
@@ -163,12 +165,15 @@ class UserFollowingView(APIView):
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
-            following = Follow.objects.filter(following=user)
-            following_list = [following.follower for following in following]
+            following = Follow.objects.filter(follower_id=user_id)
+            following_list = [follow.following.username for follow in following]
             return Response(following_list, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({})
-        
+            return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"Error fetching following for user {user_id}: {e}")
+            return Response({"message": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+               
 class FollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 

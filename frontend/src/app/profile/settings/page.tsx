@@ -3,12 +3,12 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../Context/AuthContext";
 
 export default function Profile() {
-  const { update } = useAuth();
-  const { user } = useAuth();
+  const { update, user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [username, setUsername] = useState(user?.username || "");
-  const [picture, setPicture] = useState(user?.picture || "");
+  const [picture, setPicture] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   useEffect(() => {
@@ -16,19 +16,13 @@ export default function Profile() {
       setName(user.name || "");
       setEmail(user.email || "");
       setUsername(user.username || "");
-      setPicture(user.picture || "");
+      
+      if (user.picture) {
+        const fullImageUrl = `http://localhost:8000${user.picture}`;
+        setPicture(fullImageUrl);
+      }
     }
   }, [user]);
-
-  if (!user) {
-    return (
-      <div>
-        <h1 className="flex flex-col h-screen text-4xl items-center justify-center text-blue-500">
-          You need to log in to show the settings page
-        </h1>
-      </div>
-    );
-  }
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -45,20 +39,16 @@ export default function Profile() {
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPicture(file);
+      setPicture(URL.createObjectURL(file));
+      setUploadedFile(file);
       setUploadedFileName(file.name);
     }
   };
 
   const handleUpdate = async () => {
-    const updatedData = {
-      name,
-      email,
-      username,
-    };
-
-    if (picture instanceof File) {
-      updatedData.picture = picture;
+    const updatedData = { name, email, username };
+    if (uploadedFile) {
+      updatedData.picture = uploadedFile;
     }
 
     try {
@@ -74,12 +64,21 @@ export default function Profile() {
       <div className="flex flex-col items-center w-full max-w-md">
         <div className="flex flex-row items-center bg-white shadow-lg rounded-lg p-6 w-full mb-6">
           <div className="w-20 h-20 bg-black rounded-full overflow-hidden">
-            {user.picture && (
+            {picture ? (
               <img
-                src={user.picture}
+                src={picture}
                 alt="Profile Picture"
                 className="object-cover w-full h-full"
+                onError={(e) => {
+                  console.error("Error loading image:", e);
+                  e.target.onerror = null;
+                  e.target.src = "/path/to/fallback/image.jpg";
+                }}
               />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white">
+                No Image
+              </div>
             )}
           </div>
           <div className="ml-4">
