@@ -10,6 +10,7 @@ import styles from "../../style/ArtistDetail.module.css";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import { handleFollow, handleUnfollow } from "../../fetch/fetchData";
 
 export default function ArtistPage() {
   const [albums, setAlbums] = useState([]);
@@ -18,7 +19,8 @@ export default function ArtistPage() {
   const [error, setError] = useState(null);
   const params = useParams();
   const name = params.name as string;
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -28,10 +30,15 @@ export default function ArtistPage() {
         setAlbums(fetchedAlbums);
         const token = localStorage.getItem("token");
         if (token) {
-          const followStatus = await checkFollowStatus(fetchedArtist.id);
-          setIsFollowing(followStatus.is_following);
+          try {
+            const followStatus = await checkFollowStatus(fetchedArtist.id);
+            setIsFollowing(followStatus.is_following);
+          } catch (error) {
+            console.error("Error checking follow status:", error);
+          }
         }
       } catch (error) {
+        console.error("Error loading data:", error);
         setError("Failed to load data. Please try again");
       }
     };
@@ -43,60 +50,18 @@ export default function ArtistPage() {
   if (error) return <div className={styles.error}>{error}</div>;
   if (!artist) return <div className={styles.loading}>Loading...</div>;
 
-  const handleFollow = async () => {
-    console.log("Follow button clicked"); // Debugging statement
-    try {
-      const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
-      console.log("token:", token); // Debugging statement
-      if (!token) {
-        alert("You need to be logged in to follow an artist.");
-        return;
-      }
-
-      const response = await axios.post(
-        `http://localhost:8000/api/user/follow/${artist.id}/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      alert(response.data.message);
+  const onFollow = async () => {
+    const success = await handleFollow(artist.id);
+    if (success) {
       setIsFollowing(true);
-    } catch (error) {
-      console.error("Error following artist:", error);
-      alert("An error occurred while trying to follow the artist.");
     }
   };
 
-  const handleUnfollow = async () => {
-    console.log("Unfollow button clicked"); // Debugging statement
-    try {
-      const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
-      console.log("token:", token); // Debugging statement
-      if (!token) {
-        alert("You need to be logged in to unfollow an artist.");
-        return;
-      }
-
-      const response = await axios.delete(
-        `http://localhost:8000/api/user/unfollow/${artist.id}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      alert(response.data.message);
+  const onUnfollow = async () => {
+    console.log("Attempting to unfollow artist with ID:", artist.id); 
+    const success = await handleUnfollow(artist.id);
+    if (success) {
       setIsFollowing(false);
-    } catch (error) {
-      console.error("Error unfollowing artist:", error);
-      alert("An error occurred while trying to unfollow the artist.");
     }
   };
 
@@ -135,11 +100,11 @@ export default function ArtistPage() {
         <p className={styles.artistBio}>{artist.bio}</p>
         {token &&
           (isFollowing ? (
-            <button className={styles.followButton} onClick={handleUnfollow}>
+            <button className={styles.followButton} onClick={onUnfollow}>
               Unfollow
             </button>
           ) : (
-            <button className={styles.followButton} onClick={handleFollow}>
+            <button className={styles.followButton} onClick={onFollow}>
               Follow
             </button>
           ))}

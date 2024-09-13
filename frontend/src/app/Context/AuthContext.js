@@ -97,22 +97,24 @@ export const AuthProvider = ({ children }) => {
     
         try {
             const response = await fetch("http://localhost:8000/api/user/update/", {
-                method: "PUT", // Use PUT method
+                method: "PUT",
                 headers: {
-                    "Authorization": `Bearer ${token}`, // Include the token in the Authorization header
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: formData,
             });
     
-            // Handle the response if needed
             if (response.ok) {
                 const data = await response.json();
-                console.log("Update successful:", data);
+                setUser(data);  
+                return data; 
             } else {
                 console.error("Update failed:", response.statusText);
+                throw new Error(response.statusText);
             }
         } catch (error) {
             console.error("Error updating profile:", error);
+            throw error;
         }
     };
 

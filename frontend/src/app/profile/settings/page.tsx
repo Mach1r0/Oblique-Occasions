@@ -11,6 +11,15 @@ export default function Profile() {
   const [picture, setPicture] = useState(user?.picture || "");
   const [uploadedFileName, setUploadedFileName] = useState("");
 
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setUsername(user.username || "");
+      setPicture(user.picture || "");
+    }
+  }, [user]);
+
   if (!user) {
     return (
       <div>
@@ -44,15 +53,20 @@ export default function Profile() {
   const handleUpdate = async () => {
     const updatedData = {
       name,
-    email,
+      email,
       username,
     };
-  
-    if (picture) {
+
+    if (picture instanceof File) {
       updatedData.picture = picture;
     }
-  
-    await update(updatedData);
+
+    try {
+      const updatedUser = await update(updatedData);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      alert("Failed to update profile. Please try again.");
+    }
   };
 
   return (
@@ -60,11 +74,13 @@ export default function Profile() {
       <div className="flex flex-col items-center w-full max-w-md">
         <div className="flex flex-row items-center bg-white shadow-lg rounded-lg p-6 w-full mb-6">
           <div className="w-20 h-20 bg-black rounded-full overflow-hidden">
-            <img
-              src={typeof picture === "string" ? picture : URL.createObjectURL(picture)}
-              alt="Profile Picture"
-              className="object-cover w-full h-full"
-            />
+            {user.picture && (
+              <img
+                src={user.picture}
+                alt="Profile Picture"
+                className="object-cover w-full h-full"
+              />
+            )}
           </div>
           <div className="ml-4">
             <h1 className="text-2xl font-semibold text-gray-800">{name}</h1>
@@ -105,7 +121,9 @@ export default function Profile() {
               />
             </div>
             <div>
-              <label htmlFor="picture" className="block mb-1">Picture</label>
+              <label htmlFor="picture" className="block mb-1">
+                Picture
+              </label>
               <label
                 htmlFor="picture"
                 className="block w-full bg-black text-white px-4 py-2 rounded-md cursor-pointer text-center"
