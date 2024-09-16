@@ -12,11 +12,20 @@ import Link from "next/link";
 import axios from "axios";
 import { handleFollow, handleUnfollow } from "../../fetch/fetchData";
 
+interface Artist {
+  id: string;
+  name: string;
+  picture?: string;
+  location?: string;
+  bio?: string;
+  website?: string;
+}
+
 export default function ArtistPage() {
   const [albums, setAlbums] = useState([]);
-  const [artist, setArtist] = useState(null);
+  const [artist, setArtist] = useState<Artist | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const name = params.name as string;
   const token = localStorage.getItem("token");
@@ -51,6 +60,7 @@ export default function ArtistPage() {
   if (!artist) return <div className={styles.loading}>Loading...</div>;
 
   const onFollow = async () => {
+    if (!artist) return;
     const success = await handleFollow(artist.id);
     if (success) {
       setIsFollowing(true);
@@ -58,6 +68,7 @@ export default function ArtistPage() {
   };
 
   const onUnfollow = async () => {
+    if (!artist) return;
     console.log("Attempting to unfollow artist with ID:", artist.id); 
     const success = await handleUnfollow(artist.id);
     if (success) {
