@@ -61,16 +61,16 @@ export default function ArtistPage() {
 
   const onFollow = async () => {
     if (!artist) return;
-    const success = await handleFollow(artist.id);
+    const success = await handleFollow(Number(artist.id));
     if (success) {
       setIsFollowing(true);
     }
   };
-
+  
   const onUnfollow = async () => {
     if (!artist) return;
     console.log("Attempting to unfollow artist with ID:", artist.id); 
-    const success = await handleUnfollow(artist.id);
+    const success = await handleUnfollow(Number(artist.id));
     if (success) {
       setIsFollowing(false);
     }

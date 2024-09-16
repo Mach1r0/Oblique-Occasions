@@ -1,26 +1,33 @@
 'use client';
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
-interface User {
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
   picture?: string;
-  // Adicione outras propriedades conforme necessário
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  signUp: (name: string, username: string, email: string, password: string) => Promise<void>;
+  signUp: (name: string, username: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   error: string;
   logout: () => void;
-  update: (updatedData: any) => Promise<any>;
+  update: (data: Partial<User>) => Promise<User>;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
@@ -34,7 +41,9 @@ export const AuthProvider = ({ children }) => {
 
     if (storedToken) {
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
     } else if (cookieToken) {
       setToken(cookieToken);
       localStorage.setItem('token', cookieToken);
@@ -43,8 +52,8 @@ export const AuthProvider = ({ children }) => {
     setIsReady(true);
   }, []);
 
-  const login = async (username: string, password: string) => {  
-    const data = { username, password };  
+  const login = async (username: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+    const data = { username, password };
 
     try {
       const response = await fetch("http://localhost:8000/api/user/login/", {
@@ -63,14 +72,12 @@ export const AuthProvider = ({ children }) => {
         return { ok: false, error: result.detail || "Login failed" };
       }
 
-      if (response.ok) {
-        localStorage.setItem("token", result.access);
-        localStorage.setItem("user", JSON.stringify(result.user));
-        setToken(result.access);
-        setUser(result.user); 
-        router.push("/");
-        return { ok: true };
-      }
+      localStorage.setItem("token", result.access);
+      localStorage.setItem("user", JSON.stringify(result.user));
+      setToken(result.access);
+      setUser(result.user);
+      router.push("/");
+      return { ok: true };
     } catch (error) {
       console.error("Login error:", error);
       setError("Login error, please try again");
@@ -78,9 +85,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signUp = async (name: string, username: string, email: string, password: string) => {
+  function isFile(value: any): value is File {
+    return value instanceof File;
+  }
+  
+  const signUp = async (name: string, username: string, email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
     const data = { name, username, email, password };
-
+  
     try {
       const response = await fetch("http://localhost:8000/api/user/register/", {
         method: "POST",
@@ -89,28 +100,31 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
-        router.push("/login");
+        return { ok: true };
       } else {
         const result = await response.json();
-        throw new Error(result.message || "Failed to sign up");
+        return { ok: false, error: result.message || "Failed to sign up" };
       }
     } catch (error) {
-      console.error("Error signing up:", error);
-      setError(error.message);
+      return { ok: false, error: "An unknown error occurred" };
     }
   };
 
-  const update = async (updatedData: any) => {
+  const update = async (data: Partial<User>): Promise<User> => {
     const token = localStorage.getItem("token");
     const formData = new FormData();
   
-    for (const key in updatedData) {
-      if (key === 'picture' && updatedData[key] instanceof File) {
-        formData.append(key, updatedData[key], updatedData[key].name);
-      } else {
-        formData.append(key, updatedData[key]);
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key as keyof User];
+        
+        if (key === 'picture' && isFile(value)) {
+          formData.append(key, value, value.name);
+        } else if (value !== undefined) {
+          formData.append(key, String(value));  // Cast to string or handle other types accordingly
+        }
       }
     }
   
@@ -125,8 +139,8 @@ export const AuthProvider = ({ children }) => {
   
       if (response.ok) {
         const data = await response.json();
-        setUser(data);  
-        return data; 
+        setUser(data);
+        return data;
       } else {
         const errorData = await response.json();
         console.error("Update failed:", errorData);
@@ -137,7 +151,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-
+  
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -161,4 +175,4 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-export default AuthContext;
+export { AuthContext, AuthProvider };

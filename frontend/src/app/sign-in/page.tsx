@@ -1,6 +1,6 @@
 'use client';
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import React from 'react';
 import style from '../style/Sign-in.module.css';
 import { useAuth } from '../Context/AuthContext';
@@ -8,17 +8,17 @@ import { useAuth } from '../Context/AuthContext';
 export default function SignIn() {
   const { signUp } = useAuth();
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [name, setName] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError("");
+    setError('');
 
     if (password !== confirmPassword) {
       setError("Passwords don't match");
@@ -26,17 +26,20 @@ export default function SignIn() {
     }
 
     try {
+      setLoading(true);
       const response = await signUp(name, username, email, password);
-      if (response && response.ok) {
+      setLoading(false);
+      if (response.ok) {
         router.push('/login');
       } else {
-        throw new Error("Failed to sign up");
+        setError(response.error || "Failed to sign up");
       }
     } catch (error) {
+      setLoading(false);
       console.error(error);
       setError("Failed to sign up");
     }
-  }
+  };
 
   return (
     <div className={style['container-signin']}>
@@ -56,7 +59,7 @@ export default function SignIn() {
           </div>
 
           <div className={style['form-group']}>
-            <label htmlFor="name" className={style['label-text']} >Name</label>
+            <label htmlFor="name" className={style['label-text']}>Name</label>
             <input type="text" id="name" name="name" className={style['input-field']} value={name}  onChange={(e) => setName(e.target.value)}/>
           </div>
 
@@ -75,7 +78,9 @@ export default function SignIn() {
             <input type="password" id="confirmPassword" name="confirmPassword" className={style['input-field']} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
           </div>
 
-          <button type="submit" className={style['submit-button']}>Sign In</button>
+          <button type="submit" className={style['submit-button']} disabled={loading}>
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
         </form>
 
         {error && <div className={style['error-message']}>{error}</div>}

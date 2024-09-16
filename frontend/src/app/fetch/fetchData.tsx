@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+interface FollowUser {
+  id: number;
+  picture: string;
+  name: string;
+}
+
 export async function fetchAlbums() {
   try {
     const response = await fetch("http://localhost:8000/api/albums/");
@@ -15,7 +21,7 @@ export async function fetchAlbums() {
   }
 }
 
-export const checkFollowStatus = async (userId) => {
+export const checkFollowStatus = async (userId: number) => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.log("No token found");
@@ -47,7 +53,7 @@ export const checkFollowStatus = async (userId) => {
   }
 };
 
-export async function fetchArtist(artistSlug) {
+export async function fetchArtist(artistSlug: string) {
   try {
     const response = await fetch(`http://localhost:8000/api/artists/${artistSlug}/`);
     if (!response.ok) {
@@ -62,7 +68,7 @@ export async function fetchArtist(artistSlug) {
   }
 }
 
-export async function fetchArtistAlbums(artistSlug) {
+export async function fetchArtistAlbums(artistSlug: string) {
   try {
     const response = await fetch(`http://localhost:8000/api/artists/${artistSlug}/albums/`);
     if (!response.ok) {
@@ -77,7 +83,7 @@ export async function fetchArtistAlbums(artistSlug) {
   }
 }
 
-export async function fetchAlbum(albumName) {
+export async function fetchAlbum(albumName: string) {
   try {
     const encodedName = encodeURIComponent(albumName.replace(/ /g, '-'));
     const response = await fetch(`http://localhost:8000/api/albums/name/${encodedName}/`);
@@ -93,7 +99,7 @@ export async function fetchAlbum(albumName) {
   }
 }
 
-export async function FollowersList(userId) {
+export async function FollowersList(userId: number): Promise<FollowUser[]> {
   try {
     const response = await fetch(`http://localhost:8000/api/user/followers/${userId}/`, {
       method: 'GET',
@@ -114,7 +120,7 @@ export async function FollowersList(userId) {
   }
 }
 
-export async function FollowingList(userId) {
+export async function FollowingList(userId: number): Promise<FollowUser[]> {
   try {
     const response = await fetch(`http://localhost:8000/api/user/following/${userId}/`, {
       method: 'GET',
@@ -135,7 +141,6 @@ export async function FollowingList(userId) {
   }
 }
 
-
 export async function fetchArtists() {
   try {
     const response = await fetch(`http://localhost:8000/api/artists/`);
@@ -151,7 +156,7 @@ export async function fetchArtists() {
   }
 }
 
-export async function followArtist(artistId) {
+export async function followArtist(artistId: number) {
   try {
     const response = await fetch(`http://localhost:8000/api/user/follow/artist/${artistId}/`, {
       method: 'POST',
@@ -172,7 +177,7 @@ export async function followArtist(artistId) {
   }
 }
 
-export const handleFollow = async (artistId) => {
+export const handleFollow = async (artistId: number) => {
   console.log("Follow button clicked");
   try {
     const token = localStorage.getItem("token");
@@ -211,7 +216,7 @@ export const handleFollow = async (artistId) => {
   }
 };
 
-export const handleUnfollow = async (artistId) => {
+export const handleUnfollow = async (artistId: number) => {
   console.log("Unfollow button clicked");
   try {
     const token = localStorage.getItem("token");

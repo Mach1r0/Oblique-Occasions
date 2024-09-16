@@ -1,14 +1,15 @@
-"use client";
+'use client'
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../Context/AuthContext";
+import { User } from "../../Context/AuthContext"; // Import User type
 
-export default function Profile() {
+export default function Settings() {
   const { update, user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [username, setUsername] = useState(user?.username || "");
   const [picture, setPicture] = useState("");
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   useEffect(() => {
@@ -24,40 +25,49 @@ export default function Profile() {
     }
   }, [user]);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
 
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
 
-  const handleUsernameChange = (e) => {
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
-  const handlePictureChange = (e) => {
-    const file = e.target.files[0];
+  const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setPicture(URL.createObjectURL(file));
       setUploadedFile(file);
       setUploadedFileName(file.name);
     }
   };
-
+  
   const handleUpdate = async () => {
-    const updatedData = { name, email, username };
-    if (uploadedFile) {
-      updatedData.picture = uploadedFile;
-    }
-
+    const updatedData: Partial<User> = { name, email, username };
+  
     try {
+      // Call the update function with updatedData
       const updatedUser = await update(updatedData);
+  
+      // Handle picture update separately if needed
+      if (uploadedFile) {
+        // Assuming update function will handle picture update through FormData
+        const formData = new FormData();
+        formData.append('picture', uploadedFile, uploadedFile.name);
+        // Call a separate API endpoint or function to handle picture update if necessary
+        // await updatePicture(formData);
+      }
+  
       alert("Profile updated successfully!");
     } catch (error) {
       alert("Failed to update profile. Please try again.");
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-6 overflow-y-auto">
@@ -71,8 +81,8 @@ export default function Profile() {
                 className="object-cover w-full h-full"
                 onError={(e) => {
                   console.error("Error loading image:", e);
-                  e.target.onerror = null;
-                  e.target.src = "/path/to/fallback/image.jpg";
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/path/to/fallback/image.jpg";
                 }}
               />
             ) : (

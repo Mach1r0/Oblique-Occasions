@@ -11,17 +11,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Alterar a porta externa para 5433
 
   backend:
     build: ./backend
     container_name: django_backend
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432  # Porta interna do contêiner PostgreSQL
     volumes:
       - ./backend:/app
     ports:
