@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"  # Alterar a porta externa para 5433
+      - "5433:5432"
 
   backend:
     build: ./backend
@@ -22,7 +22,10 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432  # Porta interna do contêiner PostgreSQL
+      POSTGRES_PORT: 5432
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_PASSWORD: adminpassword
     volumes:
       - ./backend:/app
     ports:
@@ -31,13 +34,12 @@ services:
       - postgres
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: nextjs_frontend
-    command: npm run dev
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api/
-    volumes:
-      - ./frontend:/app
+      NEXT_PUBLIC_API_URL: http://backend:8000/api/
     ports:
       - "3000:3000"
     depends_on:

@@ -1,5 +1,5 @@
 # Use uma imagem base adequada com Node.js atualizado
-FROM node:18 AS builder
+FROM node:18-alpine AS builder
 
 # Defina o diretório de trabalho
 WORKDIR /app
@@ -8,12 +8,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instale as dependências
-RUN npm install
+RUN npm ci
 
 # Copie o restante do código da aplicação
 COPY . .
 
-# Construa a aplicação
+# Construa a aplicação Next.js
 RUN npm run build
 
 # Use uma imagem base menor para o ambiente de produção
@@ -26,15 +26,10 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-
-# Se você tiver um arquivo next.config.js, descomente a linha abaixo
-# COPY --from=builder /app/next.config.js ./
-
-# Instale as dependências de produção
-RUN npm install --only=production
+COPY --from=builder /app/node_modules ./node_modules
 
 # Exponha a porta que a aplicação irá rodar
 EXPOSE 3000
 
-# Comando para iniciar a aplicação
-CMD ["npm", "start"]
+# Comando para iniciar a aplicação em produção
+CMD ["npm", "run", "start"]

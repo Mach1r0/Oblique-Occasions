@@ -10,10 +10,10 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(name=name, email=email, username=username, **extra_fields)
         user.set_password(password)
-        user.save(using=self.db)
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, nome, email, nickname, password=None, **extra_fields):
+    def create_superuser(self, name, email, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -22,8 +22,8 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True')
         
-        return self.create_user(nome, email, nickname, password, **extra_fields)
-
+        return self.create_user(name, email, username, password, **extra_fields)
+        
 
 class User(AbstractUser):
     name = models.CharField(max_length=100)
