@@ -119,15 +119,30 @@ class FollowArtistView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, artist_id):
-        try:
-            artist = Artist.objects.get(id=artist_id)
-            follow, created = Follow.objects.get_or_create(follower=request.user, following=artist)
-            if created:
-                return Response({"message": f"You are now following {artist.name}"}, status=status.HTTP_201_CREATED)
-            return Response({"message": f'You are already following {artist.name}'}, status=status.HTTP_400_BAD_REQUEST)
-        except Artist.DoesNotExist:
-            return Response({"message": "Artist not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+        artist = get_object_or_404(Artist, id=artist_id)
+        user = request.user
+
+        if Follow.objects.filter(follower=user, following=artist.user).exists():
+            return Response({"message": "You are already following this artist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        follow = Follow.objects.create(follower=user, following=artist.user)
+        return Response({"message": f"You are now following {artist.user.name}"}, status=status.HTTP_201_CREATED)
+
+class UnfollowArtistView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, artist_id):
+        artist = get_object_or_404(Artist, id=artist_id)
+        user = request.user
+
+        follow = Follow.objects.filter(follower=user, following=artist.user).first()
+        if not follow:
+            return Response({"message": "You are not following this artist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        follow.delete()
+        return Response({"message": f"You have unfollowed {artist.user.name}"}, status=status.HTTP_200_OK)
+
+
 class UnfollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -156,8 +171,6 @@ class UserFollowersView(APIView):
         except User.DoesNotExist:
             logger.error(f"User with ID {user_id} not found")
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
         
 class UserFollowingView(APIView):
     permission_classes = [IsAuthenticated]

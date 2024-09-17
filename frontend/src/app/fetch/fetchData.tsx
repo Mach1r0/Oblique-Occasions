@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-interface FollowUser {
+export interface FollowUser {
   id: number;
   picture: string;
   name: string;
@@ -120,9 +120,9 @@ export async function FollowersList(userId: number): Promise<FollowUser[]> {
   }
 }
 
-export async function FollowingList(userId: number): Promise<FollowUser[]> {
+export async function FollowingList(artistId: number): Promise<FollowUser[]> {
   try {
-    const response = await fetch(`http://localhost:8000/api/user/following/${userId}/`, {
+    const response = await fetch(`http://localhost:8000/api/user/following/${artistId}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -156,24 +156,41 @@ export async function fetchArtists() {
   }
 }
 
-export async function followArtist(artistId: number) {
+export async function followArtist(artistId: number): Promise<boolean> {
   try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log("No token found");
+      return false;
+    }
+
     const response = await fetch(`http://localhost:8000/api/user/follow/artist/${artistId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`  
+        'Authorization': `Bearer ${token}`
       }
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+
+    if (response.status === 403) {
+      console.log("Authentication failed. Token may be invalid or expired.");
+      return false;
     }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     console.log("Followed artist:", data);
-    return data;
+    return true;
   } catch (error) {
     console.error("Error following artist:", error);
-    throw error;
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    return false;
   }
 }
 
@@ -186,8 +203,36 @@ export const handleFollow = async (artistId: number) => {
       return false;
     }
 
+    const success = await followArtist(artistId);
+    if (success) {
+      alert("You are now following this artist.");
+      return true;
+    } else {
+      throw new Error("Failed to follow artist.");
+    }
+  } catch (error) {
+    console.error("Error following artist:", error);
+    if (error instanceof Error) {
+      alert(error.message);
+    } else {
+      alert("An error occurred while trying to follow the artist.");
+    }
+    return false;
+  }
+};
+
+
+export const handleUnfollow = async (artistId: number) => {
+  console.log("Unfollow button clicked");
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You need to be logged in to unfollow an artist.");
+      return false;
+    }
+
     const response = await fetch(
-      `http://localhost:8000/api/user/follow/${artistId}/`,
+      `http://localhost:8000/api/user/unfollow/artist/${artistId}/`,
       {
         method: 'POST',
         headers: {
@@ -203,53 +248,8 @@ export const handleFollow = async (artistId: number) => {
     }
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    alert(data.message);
-    return true;
-  } catch (error) {
-    console.error("Error following artist:", error);
-    alert("An error occurred while trying to follow the artist.");
-    return false;
-  }
-};
-
-export const handleUnfollow = async (artistId: number) => {
-  console.log("Unfollow button clicked");
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You need to be logged in to unfollow an artist.");
-      return false;
-    }
-
-    const response = await fetch(
-      `http://localhost:8000/api/user/unfollow/${artistId}/`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (response.status === 403) {
-      alert("Authentication failed. Please log in again.");
-      return false;
-    }
-
-    if (response.status === 400) {
-      const data = await response.json();
-      console.log("Unfollow error:", data.message);
-      alert(data.message);
-      return false;
-    }
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -257,7 +257,11 @@ export const handleUnfollow = async (artistId: number) => {
     return true;
   } catch (error) {
     console.error("Error unfollowing artist:", error);
-    alert("An error occurred while trying to unfollow the artist.");
+    if (error instanceof Error) {
+      alert(error.message || "An error occurred while trying to unfollow the artist.");
+    } else {
+      alert("An unknown error occurred while trying to unfollow the artist.");
+    }
     return false;
   }
-};
+}

@@ -10,10 +10,10 @@ import styles from "../../style/ArtistDetail.module.css";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { handleFollow, handleUnfollow } from "../../fetch/fetchData";
+import { handleFollow, handleUnfollow} from "../../fetch/fetchData";
 
 interface Artist {
-  id: string;
+  id: number; 
   name: string;
   picture?: string;
   location?: string;
@@ -38,10 +38,11 @@ export default function ArtistPage() {
         const fetchedAlbums = await fetchArtistAlbums(name);
         setAlbums(fetchedAlbums);
         const token = localStorage.getItem("token");
-        if (token) {
+        if (token && fetchedArtist && fetchedArtist.id) {
           try {
             const followStatus = await checkFollowStatus(fetchedArtist.id);
             setIsFollowing(followStatus.is_following);
+  
           } catch (error) {
             console.error("Error checking follow status:", error);
           }

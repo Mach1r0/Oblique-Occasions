@@ -1,155 +1,147 @@
-'use client'
-import React, { useState, useEffect } from "react";
-import { useAuth, User } from "../Context/AuthContext";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../Context/AuthContext';
+import { FollowingList, FollowersList, FollowUser } from '../fetch/fetchData';
+import Link from 'next/link';
 
 export default function Profile() {
-  const { update, user } = useAuth();
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [username, setUsername] = useState(user?.username || "");
-  const [picture, setPicture] = useState(user?.picture ? `http://localhost:8000${user.picture}` : "");
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState("");
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('following');
+  const [following, setFollowing] = useState<FollowUser[]>([]);
+  const [followers, setFollowers] = useState<FollowUser[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
-      setUsername(user.username || "");
+    const fetchFollowData = async () => {
+      if (user) {
+        try {
+          const followingData = await FollowingList(artistId);
+          const followersData = await FollowersList(artistId);
 
-      if (user.picture) {
-        setPicture(`http://localhost:8000${user.picture}`);
+          setFollowing(followingData || []);
+          setFollowers(followersData || []);
+        } catch (err) {
+          console.error("Error fetching follow data:", err);
+          setError("Failed to load follow data. Please try again later.");
+        }
       }
     }
+
+    fetchFollowData();
   }, [user]);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value);
+  if (!user) {
+    return <div>
+      <h1 className='flex flex-col h-screen text-4xl items-center justify-center text-blue-500'>
+        You need to log in to show the profile page
+      </h1>
+    </div>;
+  }
 
-  const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPicture(URL.createObjectURL(file));
-      setUploadedFile(file);
-      setUploadedFileName(file.name);
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (url && !url.startsWith('http')) {
+      return `http://localhost:8000${url}`;
     }
-  };
-
-  const handleUpdate = async () => {
-    const updatedData: Partial<User> = { name, email, username };
-  
-    try {
-      // Call the update function with updatedData
-      const updatedUser = await update(updatedData);
-  
-      // Handle picture update separately if needed
-      if (uploadedFile) {
-        // Assuming update function will handle picture update through FormData
-        const formData = new FormData();
-        formData.append('picture', uploadedFile, uploadedFile.name);
-        // Call a separate API endpoint or function to handle picture update if necessary
-        // await updatePicture(formData);
-      }
-  
-      alert("Profile updated successfully!");
-    } catch (error) {
-      alert("Failed to update profile. Please try again.");
-    }
+    return url || '/img/img-default-perfil.png';
   };
 
   return (
-    <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-6 overflow-y-auto">
-      <div className="flex flex-col items-center w-full max-w-md">
-        <div className="flex flex-row items-center bg-white shadow-lg rounded-lg p-6 w-full mb-6">
-          <div className="w-20 h-20 bg-black rounded-full overflow-hidden">
-            {picture ? (
-              <img
-                src={picture}
-                alt="Profile Picture"
-                className="object-cover w-full h-full"
-                onError={(e) => {
-                  console.error("Error loading image:", e);
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = "/path/to/fallback/image.jpg";
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white">
-                No Image
+    <div className='flex flex-col items-center w-full h-screen bg-gray-100 p-6'>
+      <div className='flex flex-row items-center bg-white shadow-lg rounded-lg p-6 w-full max-w-md'>
+        <div className='w-20 h-20 bg-black rounded-full overflow-hidden'>
+          <img
+            src={getFullImageUrl(user.picture)}
+            alt="Profile Picture"
+            className='object-cover w-full h-full'
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = '/img/img-default-perfil.png';
+            }}
+          />
+        </div>
+        <div className='ml-4'>
+          <h1 className='text-2xl font-semibold text-gray-800'>{user.name}</h1>
+          <Link href='profile/settings'>
+            <button className='mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'>
+              Edit Profile
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <div className='flex mt-10'>
+        <button
+          onClick={() => setActiveTab('following')}
+          className={`px-4 py-2 ${activeTab === 'following' ? 'bg-blue-500 text-white' : 'bg-gray-200'} rounded-l-md`}
+        >
+          Following
+        </button>
+        <button
+          onClick={() => setActiveTab('followers')}
+          className={`px-4 py-2 ${activeTab === 'followers' ? 'bg-blue-500 text-white' : 'bg-gray-200'} rounded-r-md`}
+        >
+          Followers
+        </button>
+      </div>
+
+      <div className='flex flex-col mt-6 bg-white shadow-lg rounded-lg p-6 w-full max-w-md'>
+        {error && <p className="text-red-500">{error}</p>}
+        {activeTab === 'following' && (
+          <div>
+            <h2 className='text-xl font-semibold text-gray-800 mb-4'>Following</h2>
+            {following.length > 0 ? (
+              <div className='space-y-4'>
+                {following.map((followedUser) => (
+                  <div key={followedUser.id} className='flex items-center space-x-4'>
+                    <img
+                      src={getFullImageUrl(followedUser.picture)}
+                      alt='Following picture'
+                      className='w-10 h-10 rounded-full'
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement; // Fix applied here
+                        target.onerror = null;
+                        target.src = '/img/img-default-perfil.png';
+                      }}
+                    />
+                    <h3 className='text-lg font-medium'>{followedUser.name}</h3>
+                  </div>
+
+                ))}
               </div>
+            ) : (
+              <p className='text-gray-600'>You are not following anyone yet.</p>
             )}
           </div>
-          <div className="ml-4">
-            <h1 className="text-2xl font-semibold text-gray-800">{name}</h1>
-          </div>
-        </div>
+        )}
 
-        <div className="flex flex-col bg-white shadow-lg rounded-lg p-6 w-full">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Profile</h2>
-          <form className="flex flex-col gap-3 w-full">
-            <div>
-              <label className="block mb-1">Name</label>
-              <input
-                type="text"
-                name="name"
-                value={name}
-                onChange={handleNameChange}
-                className="w-full border-2 bg-white border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Email</label>
-              <input
-                type="text"
-                name="email"
-                value={email}
-                onChange={handleEmailChange}
-                className="w-full border-2 bg-white border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Username</label>
-              <input
-                type="text"
-                name="username"
-                value={username}
-                onChange={handleUsernameChange}
-                className="w-full border-2 bg-white border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div>
-              <label htmlFor="picture" className="block mb-1">Picture</label>
-              <label
-                htmlFor="picture"
-                className="block w-full bg-black text-white px-4 py-2 rounded-md cursor-pointer text-center"
-              >
-                Change Picture
-              </label>
-              <input
-                type="file"
-                name="picture"
-                id="picture"
-                className="hidden"
-                onChange={handlePictureChange}
-              />
-              {uploadedFileName && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Uploaded file: {uploadedFileName}
-                </p>
-              )}
-            </div>
-          </form>
-          <div className="flex mt-4">
-            <p>Do you want to change the password?</p>
+        {activeTab === 'followers' && (
+          <div>
+            <h2 className='text-xl font-semibold text-gray-800 mb-4'>Followers</h2>
+            {followers.length > 0 ? (
+              <div className='space-y-4'>
+                {followers.map((follower) => (
+                  <div key={follower.id} className='flex items-center space-x-4'>
+                    <img
+                      src={getFullImageUrl(follower.picture)}
+                      alt='Follower picture'
+                      className='w-10 h-10 rounded-full'
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement; 
+                        target.onerror = null;
+                        target.src = '/img/img-default-perfil.png';
+                      }}
+                      
+                    />
+                    <h3 className='text-lg font-medium'>{follower.name}</h3>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className='text-gray-600'>You don't have any followers yet.</p>
+            )}
           </div>
-          <button
-            className="bg-blue-500 text-white rounded-md p-2 mt-6 w-full"
-            onClick={handleUpdate}
-          >
-            Update
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

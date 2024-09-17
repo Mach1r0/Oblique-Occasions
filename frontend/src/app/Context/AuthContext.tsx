@@ -123,7 +123,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (key === 'picture' && isFile(value)) {
           formData.append(key, value, value.name);
         } else if (value !== undefined) {
-          formData.append(key, String(value));  // Cast to string or handle other types accordingly
+          formData.append(key, String(value));  
         }
       }
     }
