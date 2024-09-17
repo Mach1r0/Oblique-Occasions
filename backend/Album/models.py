@@ -21,7 +21,6 @@ class Album(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         if Album.objects.filter(slug=self.slug).exists():
-            # If the slug already exists, append a number to make it unique
             count = 1
             while Album.objects.filter(slug=f"{self.slug}-{count}").exists():
                 count += 1

@@ -4,7 +4,15 @@ import React from 'react';
 import { fetchAlbum, fetchArtist, fetchArtistAlbums } from '@/app/fetch/fetchData';
 import { useParams } from 'next/navigation';
 import styles from '../../style/Album.module.css';
-import Link from 'next/link'; 
+import Link from 'next/link';
+import AudioPlayer from './AudioPlayer';  
+
+interface Track {
+  id: string;
+  title: string;
+  music_file: string;
+  duration: number;
+}
 
 interface Album {
   id: string;
@@ -16,6 +24,7 @@ interface Album {
   bio: string;
   genres: string[];
   artist_name: string;
+  tracks: Track[];
 }
 
 interface Artist {
@@ -33,7 +42,7 @@ interface RelatedAlbum {
 export default function AlbumPage() {
   const [album, setAlbum] = useState<Album | null>(null);
   const [artist, setArtist] = useState<Artist | null>(null);
-  const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]); 
+  const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const name = params.name as string;
@@ -44,13 +53,13 @@ export default function AlbumPage() {
         const fetchedAlbums = await fetchAlbum(name);
         if (fetchedAlbums.length > 0) {
           const fetchedAlbum = fetchedAlbums[0];
-          console.log("Fetched album:", fetchedAlbum); 
+          console.log("Fetched album:", fetchedAlbum);
           setAlbum(fetchedAlbum);
           if (fetchedAlbum.artist_slug) {
             const fetchedArtist = await fetchArtist(fetchedAlbum.artist_slug);
             setArtist(fetchedArtist);
             const albums = await fetchArtistAlbums(fetchedAlbum.artist_slug);
-            setArtistAlbums(albums.slice(0, 3)); 
+            setArtistAlbums(albums.slice(0, 3));
           } else {
             console.error("Artist slug is missing from album data");
           }
@@ -74,9 +83,11 @@ export default function AlbumPage() {
       <div className={styles['album-content']}>
         <div className={styles['album-details']}>
           <img src={album.picture || '/default-album.jpg'} alt={album.title} className={styles['album-image']} />
-          <div className={styles['audio-player']}>
-            <p>Audio player placeholder</p>
-          </div>
+          {album.tracks && album.tracks.length > 0 ? (
+            <AudioPlayer tracks={album.tracks} />
+          ) : (
+            <p>No tracks available for this album.</p>
+          )}
           <div className={styles['purchase-options']}>
             <p><strong>Price:</strong> ${album.price}</p>
             <button>Buy Digital Album</button>

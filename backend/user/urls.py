@@ -19,5 +19,5 @@ urlpatterns = [
     path('followers/<int:user_id>/', UserFollowersView.as_view(), name='UserFollowers'),
     path('follow/artist/<int:artist_id>/', FollowArtistView.as_view(), name='follow_artist'),
     path('unfollow/artist/<int:artist_id>/', UnfollowArtistView.as_view(), name='unfollow_artist'),
-    path('check-follow-status/<int:user_id>/', CheckFollowStatusView.as_view(), name='check_follow_status'),
+    path('check-follow-status/<int:artist_id>/', CheckFollowStatusView.as_view(), name='check_follow_status'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

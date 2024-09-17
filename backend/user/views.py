@@ -77,13 +77,13 @@ class LoginView(APIView):
 class CheckFollowStatusView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, user_id):
+    def get(self, request, artist_id):
         try:
-            target_user = User.objects.get(id=user_id)
-            is_following = Follow.objects.filter(follower=request.user, following=target_user).exists()
+            artist = Artist.objects.get(id=artist_id)
+            is_following = Follow.objects.filter(follower=request.user, following=artist.user).exists()
             return Response({"is_following": is_following}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Artist.DoesNotExist:
+            return Response({"message": "Artist not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UpdateUserView(APIView):
     permission_classes = [IsAuthenticated]
