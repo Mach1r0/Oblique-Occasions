@@ -26,7 +26,7 @@ export default function Artist() {
                     throw new Error('Unexpected data structure');
                 }
                 
-                setArtists(artistsArray.slice(0, 10)); // Limit to 10 artists
+                setArtists(artistsArray.slice(0, 13)); 
             } catch (error) {
                 setError(error.message);
                 console.error('Error fetching artists:', error);

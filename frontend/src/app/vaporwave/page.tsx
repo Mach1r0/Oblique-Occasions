@@ -45,7 +45,7 @@ export default function Vaporwave() {
             Popular visuals in Vaporwave aesthetics include anime, classical sculptures, consumerism, computer hardware from the '80s to early '00s, city skylines, malls, and liminal spaces. The inclusion of pink and teal colors, grids, shapes, and glitches further adds to the surreal, nostalgic vibe.
           </p>
           <img
-            src="https://static.wikia.nocookie.net/aesthetics/images/3/32/Floral_shoppe.jpg/revision/latest?cb=20231014004939"
+            src="https://i.pinimg.com/originals/f5/bb/60/f5bb600299b6f93c8f19ce3bffed25b6.jpg"
             alt="Vaporwave Visuals"
             className={styles.contentImage}
           />

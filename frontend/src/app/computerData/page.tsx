@@ -32,7 +32,7 @@ export default function ComputerData() {
             The last appearance of Computer Data was in 2022. Since then, he hasn't released any new music or been active on social media. In a podcast with Vintage Society, he mentioned focusing on college. He is studying Computer Science in Germany and moved to Europe for better education and quality of life.
           </p>
           <img
-            src="https://equinox.melbourne/wp-content/uploads/2020/10/rsz_dsc_0078-1-1024x683.jpg"
+            src="https://images.squarespace-cdn.com/content/v1/588b7aa846c3c45be3e8c430/1588043252901-T8MHSMN09CRCS69K5VJG/48403922_1850367855074867_3771693374285807616_o.jpg"
             alt="Brett Henderson"
             className={styles.contentImage}
           />

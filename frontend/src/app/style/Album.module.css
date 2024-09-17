@@ -1,23 +1,23 @@
 .album-container {
   display: flex;
   flex-direction: column;
-  /* background-color: #121212; */
+  background-color: #000000;
   min-height: 100vh;
   padding: 2rem;
   color: #e0e0e0;
 }
 
 .album-title {
-  font-size: 2.5rem;
-  color: #800080;
-  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .album-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 3fr 1fr;
+  gap: 1.5rem;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -26,56 +26,80 @@
 .album-details {
   display: flex;
   flex-direction: column;
+  background-color: #121212;
+  padding: 1rem;
+  border-radius: 8px;
 }
 
 .album-image {
   width: 100%;
-  max-width: 500px;
   height: auto;
   object-fit: cover;
   margin-bottom: 1rem;
+  border: 1px solid #333;
 }
 
 .audio-player {
-  width: 100%;
+  background-color: #222;
+  padding: 0.5rem;
   margin-bottom: 1rem;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .purchase-options {
   display: flex;
   justify-content: space-between;
+  background-color: #333;
+  padding: 0.5rem;
   margin-bottom: 1rem;
+  border-radius: 4px;
 }
 
-.tracklist {
-  list-style-type: none;
-  padding: 0;
+.purchase-options button {
+  background-color: #ff5500;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.tracklist li {
-  display: flex;
-  justify-content: space-between;
+.album-info {
+  background-color: #121212;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.album-info p {
   margin-bottom: 0.5rem;
+  color: #999;
 }
 
 .artist-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  background-color: #121212;
+  padding: 1rem;
+  border-radius: 8px;
 }
 
 .artist-name {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: #ffffff;
 }
 
 .artist-image {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
+  border: 1px solid #333;
 }
 
 .social-links {
@@ -84,31 +108,34 @@
   margin-bottom: 1rem;
 }
 
+.social-links p {
+  color: #ff5500;
+  cursor: pointer;
+}
+
 .discography {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-}
-
-.album-thumbnail {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  margin-bottom: 0.5rem;
-}
-
-.album-info {
+  align-items: center;
+  background-color: #121212;
+  padding: 1rem;
+  gap: 1rem;
+  border-radius: 8px;
   margin-top: 1rem;
 }
 
-.album-info p {
-  margin-bottom: 0.5rem;
+.related-album {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.error {
-  color: #ff0000;
-  text-align: center;
-  font-size: 1.2rem;
+.related-album-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {
@@ -117,6 +144,11 @@
   }
 
   .artist-info {
+    align-items: center;
+  }
+
+  .purchase-options {
+    flex-direction: column;
     align-items: center;
   }
 }

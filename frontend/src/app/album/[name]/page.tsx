@@ -4,7 +4,7 @@ import React from 'react';
 import { fetchAlbum, fetchArtist, fetchArtistAlbums } from '@/app/fetch/fetchData';
 import { useParams } from 'next/navigation';
 import styles from '../../style/Album.module.css';
-import Link from 'next/link'; // Assuming Link is imported from next/link
+import Link from 'next/link'; 
 
 interface Album {
   id: string;
@@ -33,7 +33,7 @@ interface RelatedAlbum {
 export default function AlbumPage() {
   const [album, setAlbum] = useState<Album | null>(null);
   const [artist, setArtist] = useState<Artist | null>(null);
-  const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]); // State for artist's albums
+  const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]); 
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const name = params.name as string;
@@ -49,9 +49,8 @@ export default function AlbumPage() {
           if (fetchedAlbum.artist_slug) {
             const fetchedArtist = await fetchArtist(fetchedAlbum.artist_slug);
             setArtist(fetchedArtist);
-            // Fetch artist's albums
             const albums = await fetchArtistAlbums(fetchedAlbum.artist_slug);
-            setArtistAlbums(albums.slice(0, 3)); // Get the first 3 albums
+            setArtistAlbums(albums.slice(0, 3)); 
           } else {
             console.error("Artist slug is missing from album data");
           }
@@ -76,7 +75,6 @@ export default function AlbumPage() {
         <div className={styles['album-details']}>
           <img src={album.picture || '/default-album.jpg'} alt={album.title} className={styles['album-image']} />
           <div className={styles['audio-player']}>
-            {/* Add your audio player component here */}
             <p>Audio player placeholder</p>
           </div>
           <div className={styles['purchase-options']}>
@@ -109,10 +107,12 @@ export default function AlbumPage() {
           <div className={styles['discography']}>
             <h3>Related Albums</h3>
             {artistAlbums.length > 0 ? (
-              artistAlbums.map((relatedAlbum) => (
+              artistAlbums.slice(0, 3).map((relatedAlbum) => (  
                 <div key={relatedAlbum.id} className={styles['related-album']}>
                   <img src={relatedAlbum.picture || '/default-album.jpg'} alt={relatedAlbum.title} className={styles['related-album-image']} />
+                  <Link href={`/album/${encodeURIComponent(relatedAlbum.title.replace(/ /g, '-'))}`}>
                   <p>{relatedAlbum.title}</p>
+                  </Link>
                 </div>
               ))
             ) : (
