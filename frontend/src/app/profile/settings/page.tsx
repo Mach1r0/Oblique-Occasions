@@ -19,8 +19,7 @@ export default function Settings() {
       setUsername(user.username || "");
       
       if (user.picture) {
-        const fullImageUrl = `http://localhost:8000${user.picture}`;
-        setPicture(fullImageUrl);
+        setPicture(`http://localhost:8000${user.picture}`);
       }
     }
   }, [user]);
@@ -47,27 +46,31 @@ export default function Settings() {
   };
   
   const handleUpdate = async () => {
-    const updatedData: Partial<User> = { name, email, username };
+    const updatedData: Partial<User> = { 
+      name, 
+      email, 
+      username,
+      picture: uploadedFile || undefined 
+    };
   
     try {
-      // Call the update function with updatedData
       const updatedUser = await update(updatedData);
-  
-      // Handle picture update separately if needed
-      if (uploadedFile) {
-        // Assuming update function will handle picture update through FormData
-        const formData = new FormData();
-        formData.append('picture', uploadedFile, uploadedFile.name);
-        // Call a separate API endpoint or function to handle picture update if necessary
-        // await updatePicture(formData);
-      }
-  
       alert("Profile updated successfully!");
+      
+      setName(updatedUser.name);
+      setEmail(updatedUser.email);
+      setUsername(updatedUser.username);
+      if (updatedUser.picture) {
+        setPicture(`http://localhost:8000${updatedUser.picture}`);
+      }
+      
+      setUploadedFile(null);
+      setUploadedFileName("");
     } catch (error) {
+      console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-6 overflow-y-auto">

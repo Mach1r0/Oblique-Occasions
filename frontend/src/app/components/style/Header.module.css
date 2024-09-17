@@ -39,6 +39,7 @@
 }
 
 .imageText h2 {
+  color: white;
   font-size: 2rem;
   margin-bottom: 10px;
 }
@@ -79,6 +80,10 @@
   font-size: 1.1rem;
   border-radius: 10px;
   max-width: 80%;
+}
+
+.textOverlay:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 1024px) {

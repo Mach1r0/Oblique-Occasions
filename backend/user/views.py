@@ -13,6 +13,7 @@ import logging, datetime
 from .serializer import UserSerializer, RegisterSerializer, LoginSerializer, FollowSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  
@@ -128,6 +129,7 @@ class FollowArtistView(APIView):
         follow = Follow.objects.create(follower=user, following=artist.user)
         return Response({"message": f"You are now following {artist.user.name}"}, status=status.HTTP_201_CREATED)
 
+
 class UnfollowArtistView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -141,6 +143,7 @@ class UnfollowArtistView(APIView):
 
         follow.delete()
         return Response({"message": f"You have unfollowed {artist.user.name}"}, status=status.HTTP_200_OK)
+
 
 
 class UnfollowUserView(APIView):
@@ -179,7 +182,15 @@ class UserFollowingView(APIView):
         try:
             user = User.objects.get(id=user_id)
             following = Follow.objects.filter(follower_id=user_id)
-            following_list = [follow.following.username for follow in following]
+            following_list = []
+            for follow in following:
+                following_user = follow.following
+                following_list.append({
+                    'id': following_user.id,
+                    'username': following_user.username,
+                    'name': following_user.name,
+                    'picture': following_user.picture.url if following_user.picture else None
+                })
             return Response(following_list, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)

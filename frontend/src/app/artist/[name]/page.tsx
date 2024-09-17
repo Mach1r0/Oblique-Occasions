@@ -1,19 +1,18 @@
-"use client";
+'use client'
 import React, { useEffect, useState } from "react";
 import {
   fetchArtistAlbums,
   fetchArtist,
-  followArtist,
   checkFollowStatus,
+  handleFollow,
+  handleUnfollow
 } from "../../fetch/fetchData";
 import styles from "../../style/ArtistDetail.module.css";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
-import { handleFollow, handleUnfollow} from "../../fetch/fetchData";
 
 interface Artist {
-  id: number; 
+  id: number;
   name: string;
   picture?: string;
   location?: string;
@@ -29,53 +28,51 @@ export default function ArtistPage() {
   const params = useParams();
   const name = params.name as string;
   const token = localStorage.getItem("token");
+  const [isCheckingFollowStatus, setIsCheckingFollowStatus] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
+      setIsCheckingFollowStatus(true);
       try {
         const fetchedArtist = await fetchArtist(name);
         setArtist(fetchedArtist);
         const fetchedAlbums = await fetchArtistAlbums(name);
         setAlbums(fetchedAlbums);
-        const token = localStorage.getItem("token");
+
         if (token && fetchedArtist && fetchedArtist.id) {
-          try {
-            const followStatus = await checkFollowStatus(fetchedArtist.id);
-            setIsFollowing(followStatus.is_following);
-  
-          } catch (error) {
-            console.error("Error checking follow status:", error);
-          }
+          const followStatus = await checkFollowStatus(fetchedArtist.id);
+          setIsFollowing(followStatus);
         }
       } catch (error) {
         console.error("Error loading data:", error);
         setError("Failed to load data. Please try again");
+      } finally {
+        setIsCheckingFollowStatus(false);
       }
     };
     if (name) {
       loadData();
     }
-  }, [name]);
-
-  if (error) return <div className={styles.error}>{error}</div>;
-  if (!artist) return <div className={styles.loading}>Loading...</div>;
+  }, [name, token]);
 
   const onFollow = async () => {
     if (!artist) return;
-    const success = await handleFollow(Number(artist.id));
+    const success = await handleFollow(artist.id);
     if (success) {
       setIsFollowing(true);
     }
   };
-  
+
   const onUnfollow = async () => {
     if (!artist) return;
-    console.log("Attempting to unfollow artist with ID:", artist.id); 
-    const success = await handleUnfollow(Number(artist.id));
+    const success = await handleUnfollow(artist.id);
     if (success) {
       setIsFollowing(false);
     }
   };
+
+  if (error) return <div className={styles.error}>{error}</div>;
+  if (!artist) return <div className={styles.loading}>Loading...</div>;
 
   return (
     <div className={styles.container}>
@@ -84,16 +81,8 @@ export default function ArtistPage() {
         <div className={styles.albumGrid}>
           {albums.map((album: any, index: number) => (
             <div key={index} className={styles.albumItem}>
-              <Link
-                href={`/album/${encodeURIComponent(
-                  album.title.replace(/ /g, "-")
-                )}`}
-              >
-                <img
-                  src={album.picture}
-                  alt={album.title}
-                  className={styles.albumCover}
-                />
+              <Link href={`/album/${encodeURIComponent(album.title.replace(/ /g, "-"))}`}>
+                <img src={album.picture} alt={album.title} className={styles.albumCover} />
                 <h2 className={styles.albumTitle}>{album.title}</h2>
               </Link>
               <p className={styles.albumArtist}>{artist.name}</p>
@@ -102,39 +91,25 @@ export default function ArtistPage() {
         </div>
       </main>
       <aside className={styles.sidebar}>
-        <img
-          src={artist.picture}
-          alt={artist.name}
-          className={styles.artistImage}
-        />
+        <img src={artist.picture} alt={artist.name} className={styles.artistImage} />
         <h2 className={styles.artistName}>{artist.name}</h2>
         <p className={styles.artistLocation}>{artist.location}</p>
         <p className={styles.artistBio}>{artist.bio}</p>
-        {token &&
-          (isFollowing ? (
-            <button className={styles.followButton} onClick={onUnfollow}>
-              Unfollow
-            </button>
-          ) : (
-            <button className={styles.followButton} onClick={onFollow}>
-              Follow
-            </button>
-          ))}
-
+        {token && (
+          <button
+            className={styles.followButton}
+            onClick={isFollowing ? onUnfollow : onFollow}
+            disabled={isCheckingFollowStatus}
+          >
+            {isCheckingFollowStatus ? 'Checking...' : (isFollowing ? 'Unfollow' : 'Follow')}
+          </button>
+        )}
         <div className={styles.socialLinks}>
-          <a href="#" className={styles.socialLink}>
-            SoundCloud
-          </a>
-          <a href="#" className={styles.socialLink}>
-            Twitter
-          </a>
-          <a href="#" className={styles.socialLink}>
-            Instagram
-          </a>
+          <a href="#" className={styles.socialLink}>SoundCloud</a>
+          <a href="#" className={styles.socialLink}>Twitter</a>
+          <a href="#" className={styles.socialLink}>Instagram</a>
         </div>
-        <a href="#" className={styles.websiteLink}>
-          {artist.website}
-        </a>
+        <a href="#" className={styles.websiteLink}>{artist.website}</a>
         <div className={styles.contactHelp}>
           <a href="#">Contact {artist.name}</a>
           <a href="#">Streaming and Download help</a>

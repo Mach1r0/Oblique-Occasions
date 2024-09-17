@@ -9,38 +9,38 @@ export default function Header() {
       <div className={styles.containerContent}>
         <div className={styles.ContainerImgPrin}>
           <img
-            src="img/comet-minimalism-blank-banshee-vaporwave-wallpaper-preview.jpg"
+            src="https://f4.bcbits.com/img/0014307733_10.jpg"
             alt="header"
             className={styles.HeaderImage}
           />
           <div className={styles.imageText}>
-            <Link href="/">
-            <h2>Essential Releases, August 30, 2024</h2>
+            <Link href="/computerData">
+            <h2>Computer data</h2>
             </Link>
-              <p>Shoegaze, techno, indie psychedelia, and more.</p>
+              <p> Will computer data come back? </p>
           </div>
         </div>
         <div className={styles.ContainerImgSec}>
           <div className={styles.imgSecItem}>
             <img
-              src="img/a3339089756_16.jpg"
+              src="https://images.squarespace-cdn.com/content/v1/5bd7707c11f7847c45b4b9dd/1651265930478-R7IIGQCKHAL64FLZ18F9/a3309345917_10.jpg"
               alt="header"
               className={styles.imgSec}
             />
-            <Link href="/">
+            <Link href="/BaberBeats">
               <p className={styles.textOverlay}>
-                Ten Tour Tips from John Dwyer of OSEES
+              What is barber beats
               </p>
             </Link>
           </div>
           <div className={styles.imgSecItem}>
             <img
-              src="img/a3601077058_16.jpg"
+              src="https://res.cloudinary.com/sagacity/image/upload/c_crop,h_1080,w_1920,x_0,y_0/c_limit,dpr_auto,f_auto,fl_lossy,q_80,w_1080/vaporwave_zoevlz.jpg"
               alt="header"
               className={styles.imgSec}
             />
-            <Link href="/">
-              <p className={styles.textOverlay}>The Metal Show</p>
+            <Link href="/vaporwave">
+              <p className={styles.textOverlay}>Vaporwave all about the genrer</p>
             </Link>
           </div>
         </div>

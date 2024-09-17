@@ -21,15 +21,15 @@ export async function fetchAlbums() {
   }
 }
 
-export const checkFollowStatus = async (userId: number) => {
+export const checkFollowStatus = async (artistId: number): Promise<boolean> => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.log("No token found");
-    return { is_following: false };
+    return false;
   }
 
   try {
-    const response = await fetch(`http://localhost:8000/api/user/check-follow-status/${userId}/`, {
+    const response = await fetch(`http://localhost:8000/api/user/check-follow-status/${artistId}/`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export const checkFollowStatus = async (userId: number) => {
 
     if (response.status === 403) {
       console.log("Authentication failed. Token may be invalid or expired.");
-      return { is_following: false };
+      return false;
     }
 
     if (!response.ok) {
@@ -46,10 +46,10 @@ export const checkFollowStatus = async (userId: number) => {
     }
 
     const data = await response.json();
-    return data;
+    return data.is_following;
   } catch (error) {
     console.error("Error checking follow status:", error);
-    return { is_following: false };
+    return false;
   }
 };
 
@@ -120,9 +120,9 @@ export async function FollowersList(userId: number): Promise<FollowUser[]> {
   }
 }
 
-export async function FollowingList(artistId: number): Promise<FollowUser[]> {
+export async function FollowingList(userId: number): Promise<FollowUser[]> {
   try {
-    const response = await fetch(`http://localhost:8000/api/user/following/${artistId}/`, {
+    const response = await fetch(`http://localhost:8000/api/user/following/${userId}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +134,11 @@ export async function FollowingList(artistId: number): Promise<FollowUser[]> {
     }
     const data = await response.json();
     console.log("Fetching following", data);
-    return data;
+    return data.map((user: any) => ({
+      id: user.id,
+      name: user.name,
+      picture: user.picture
+    }));
   } catch (error) {
     console.error("Error fetching following:", error);
     throw error;

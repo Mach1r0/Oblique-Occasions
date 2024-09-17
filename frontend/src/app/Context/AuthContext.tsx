@@ -112,6 +112,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+
   const update = async (data: Partial<User>): Promise<User> => {
     const token = localStorage.getItem("token");
     const formData = new FormData();
