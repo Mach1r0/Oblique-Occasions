@@ -1,6 +1,6 @@
 # Oblique-Occasions
 
-[Vídeo do youtube]([https://www.google.com](https://youtu.be/RY-fAU5a7j8))
+Vídeo do youtube https://youtu.be/RY-fAU5a7j8
 
 slides:  https://www.canva.com/design/DAGREGp2es0/UyBENpgp52AqVUthE5jfzg/edit
 
