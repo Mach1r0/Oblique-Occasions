@@ -1,6 +1,6 @@
 from django.db import models
 
-class DefaultModel(models.Model):
+class   DefaultModel(models.Model):
     created = models.DateTimeField(db_index=True, auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

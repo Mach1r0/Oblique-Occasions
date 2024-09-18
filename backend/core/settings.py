@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'Order', 
     'corsheaders',
     'rest_framework.authtoken',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -105,7 +106,7 @@ DATABASES = {
         'USER': 'myuser',
         'PASSWORD': 'mypassword',
         'HOST': 'postgres',
-        'PORT': '5432',  # Porta interna do contêiner PostgreSQL
+        'PORT': '5432',  
     }
 }
 
@@ -202,3 +203,5 @@ CORS_ALLOWED_ORIGINS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
+
+ASGI_APPLICATION = 'core.asgi.application'
