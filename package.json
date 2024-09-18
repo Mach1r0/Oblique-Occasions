@@ -8,10 +8,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "express": "^4.21.0",
+    "js-cookie": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "js-cookie": "latest"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
