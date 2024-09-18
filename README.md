@@ -2,6 +2,8 @@
 
 [Visite o Google](https://www.google.com)
 
+Desenvolido por Gustavo lima - 211062928 e Daniel ferreira - 211061565
+
 Projeto desenvolvido para a disciplina de Orientação a Objetos, ministrada pelo professor Henrique Gomes de Moura.
 
 Oblique-Occasions é um website construído com Django REST e Next.js, utilizando PostgreSQL como banco de dados. A autenticação é feita via token JWT e a infraestrutura é gerenciada com Docker. Para rodar o projeto, basta executar o seguinte comando:
