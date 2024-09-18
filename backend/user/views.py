@@ -8,12 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Follow
+from .models import User, Follow, Review
 import logging, datetime
-from .serializer import UserSerializer, RegisterSerializer, LoginSerializer, FollowSerializer
+from .serializer import UserSerializer, RegisterSerializer, LoginSerializer, FollowSerializer, UserReviewSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from Album.models import Album
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  
@@ -220,3 +221,40 @@ class FollowUserView(APIView):
 class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
+
+
+class UserReviewViewset(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = UserReviewSerializer
+
+    def list(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)  
+            queryset = Review.objects.filter(user=user)
+            serializer = UserReviewSerializer(queryset, many=True)
+            return Response(serializer.data)    
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def create(self, request, user_id, album_id):  
+        permission_classes = [IsAuthenticated]
+        
+        try:
+            album = Album.objects.get(id=album_id)
+            user = User.objects.get(id=user_id)  
+            serializer = UserReviewSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, album=album)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": "Internal error", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+
+    def listAlbumReviews(self, request, album_id):
+        album = get_object_or_404(Album, id=album_id) 
+        queryset = Review.objects.filter(album=album)
+        serializer = UserReviewSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)  

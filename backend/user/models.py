@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from core.models import DefaultModel
 from django.utils.text import slugify
+from Album.models import Album
+from django.apps import apps
 
 class UserManager(BaseUserManager):
     def create_user(self, name, email, username, password=None, **extra_fields):
@@ -57,3 +59,19 @@ class Follow(models.Model):
     
     def __str__(self):
         return f'{self.follower} follows {self.following}'
+    
+
+from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils.text import slugify
+
+class Review(models.Model):
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='user_reviews')  # Usar string
+    album = models.ForeignKey('Album.Album', on_delete=models.CASCADE, related_name='album_reviews')  # Usar string
+    created_at = models.DateTimeField(auto_now=True)
+    rating = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.user} review for {self.album}'
+
+

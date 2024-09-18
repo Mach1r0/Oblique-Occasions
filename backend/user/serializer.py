@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import User, Follow
 from rest_framework import serializers
-from .models import User
+from .models import User, Review
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.authtoken.models import Token
@@ -13,6 +13,15 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ['follower', 'following', 'created_at']
     read_only_fields = ['follower', 'created_at']
+
+
+class UserReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    album = serializers.SlugRelatedField(slug_field='title', read_only=True)
+
+    class Meta: 
+        model = Review 
+        fields = ['id', 'user', 'album', 'rating', 'content', 'created_at']
 
 class RegisterSerializer(serializers.ModelSerializer): 
     email =  serializers.EmailField(required=True)

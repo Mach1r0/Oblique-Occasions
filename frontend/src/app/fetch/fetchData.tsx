@@ -6,6 +6,13 @@ export interface FollowUser {
   name: string;
 }
 
+export interface Review {
+  id: number;          
+  userId: number;  
+  albumId: number;    
+  review: string;
+}
+
 export async function fetchAlbums() {
   try {
     const response = await fetch("http://localhost:8000/api/albums/");
@@ -225,6 +232,38 @@ export const handleFollow = async (artistId: number) => {
   }
 };
 
+export const handleReviewSubmit = async (albumId: number, userId: number, review: string) => {
+  try {
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      alert("You need to be logged in to submit a review");
+      return false; 
+    }
+    const response = await fetch(`http://localhost:8000/api/user/review/${userId}/${albumId}/`, {  // Updated URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ review }) 
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to submit review');
+    }
+
+    const data = await response.json();
+    console.log("Review submitted successfully:", data);
+    return true; 
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    if (error instanceof Error) {
+      alert(error.message);
+    }
+    return false;
+  }
+}
 
 export const handleUnfollow = async (artistId: number) => {
   console.log("Unfollow button clicked");

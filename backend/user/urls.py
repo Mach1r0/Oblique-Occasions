@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, UserViewSet, LoginView, UpdateUserView, FollowUserView, UnfollowUserView, UserFollowingView, UserFollowersView, FollowArtistView, UnfollowArtistView, CheckFollowStatusView
+from .views import RegisterView, UserReviewViewset, UserViewSet, LoginView, UpdateUserView, FollowUserView, UnfollowUserView, UserFollowingView, UserFollowersView, FollowArtistView, UnfollowArtistView, CheckFollowStatusView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -8,6 +8,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('reviewList/<int:user_id>/', UserReviewViewset.as_view({'get': 'list', 'post': 'create'}), name='UserReviewList'), 
+    path('review/<int:user_id>/<int:album_id>/', UserReviewViewset.as_view({'post': 'create'}), name='UserReviewCreate'),
     path('register/', RegisterView.as_view(), name='Register'),
     path('login/', LoginView.as_view(), name='Login'),
     path('update/', UpdateUserView.as_view(), name='Update'),

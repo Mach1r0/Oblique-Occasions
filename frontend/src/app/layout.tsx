@@ -8,8 +8,7 @@ import { AuthProvider } from './Context/AuthContext'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Your App Name",
-  description: "Your app description",
+  title: "Oblique Occassions",
 };
 
 export default function RootLayout({
