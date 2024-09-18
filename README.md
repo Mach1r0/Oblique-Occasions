@@ -1,6 +1,10 @@
 # Oblique-Occasions
 
-[Visite o Google](https://www.google.com)
+ [Video do youtube](https://youtu.be/RY-fAU5a7j8)
+
+slides:  https://www.canva.com/design/DAGREGp2es0/UyBENpgp52AqVUthE5jfzg/edit
+
+Desenvolido por Gustavo lima - 211062928 e Daniel ferreira - 211061565
 
 Desenvolido por Gustavo lima - 211062928 e Daniel ferreira - 211061565
 
