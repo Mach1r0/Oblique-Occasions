@@ -5,6 +5,8 @@ from .models import User, Review
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.authtoken.models import Token
+from .models import Review
+from rest_framework import serializers
 
 User = get_user_model()
 
@@ -16,13 +18,12 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class UserReviewSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    user_picture = serializers.ImageField(source='user.picture', read_only=True)
+
     class Meta:
         model = Review
-        fields = ['id', 'user', 'album', 'review', 'rating']  # Certifique-se de incluir todos os campos necessários
-
-    def create(self, validated_data):
-        return Review.objects.create(**validated_data)
-
+        fields = ['id', 'review', 'rating', 'user_name', 'user_picture']  # Include user_name and user_picture
         
 class RegisterSerializer(serializers.ModelSerializer): 
     email =  serializers.EmailField(required=True)

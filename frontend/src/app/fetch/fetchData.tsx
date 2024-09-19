@@ -232,20 +232,20 @@ export const handleFollow = async (artistId: number) => {
   }
 };
 
-export const handleReviewSubmit = async (albumId: number, userId: number, review: string, rating: number) => {
+export const handleReviewSubmit = async (albumId: number, userId: number, review: string, rating: number | null) => {
   try {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     if (!token) {
       alert("You need to be logged in to submit a review");
-      return false; 
+      return false;
     }
-    const response = await fetch(`http://localhost:8000/api/user/review/${userId}/${albumId}/`, {
+    const response = await fetch(`http://localhost:8000/api/user/review/${userId}/${albumId}/`, { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ review, rating }) // Inclua o rating aqui
+      body: JSON.stringify({ user: userId, album: albumId, review, rating }) 
     });
 
     if (!response.ok) {
@@ -306,5 +306,20 @@ export const handleUnfollow = async (artistId: number) => {
       alert("An unknown error occurred while trying to unfollow the artist.");
     }
     return false;
+  }
+}
+
+export const FetchAlbumReviews = async (AlbumID: number) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/albums/AlbumsReviewList/${AlbumID}/`); 
+    if (!response.ok) {
+      alert(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    console.error("Error on fetching data", error);
+    throw error;
   }
 }

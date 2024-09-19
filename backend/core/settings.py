@@ -51,7 +51,35 @@ INSTALLED_APPS = [
     'Order', 
     'corsheaders',
     'rest_framework.authtoken',
+    'channels',
 ]
+
+ASGI_APPLICATION = 'core.asgi.application'  
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'websocket.log',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -97,6 +125,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+CHANNEL_LAYERS = {
+       'default': {
+           'BACKEND': 'channels_redis.core.RedisChannelLayer',
+           'CONFIG': {
+               "hosts": [('127.0.0.1', 6379)],
+           },
+       },
+   }
 
 DATABASES = {
     'default': {

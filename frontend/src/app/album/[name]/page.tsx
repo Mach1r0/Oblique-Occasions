@@ -1,17 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/app/Context/AuthContext"; // Importe o contexto de autenticação
+import { useAuth } from "@/app/Context/AuthContext";
 import React from "react";
 import {
   fetchAlbum,
   fetchArtist,
   fetchArtistAlbums,
   handleReviewSubmit,
+  FetchAlbumReviews,
 } from "@/app/fetch/fetchData";
 import { useParams } from "next/navigation";
 import styles from "../../style/Album.module.css";
 import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
+import { Review } from "@/app/fetch/fetchData";
 
 interface Track {
   id: string;
@@ -46,18 +48,19 @@ interface RelatedAlbum {
 }
 
 export default function AlbumPage() {
-  const { user } = useAuth(); // Use o contexto para obter o usuário
-  const userId = user?.id; // Obtenha o userId do objeto user
+  const { user } = useAuth(); 
+  const userId = user?.id; 
   const [album, setAlbum] = useState<Album | null>(null);
   const [artist, setArtist] = useState<Artist | null>(null);
   const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [reviews, setReviews] = useState<string[]>([]); // Move state hooks to the top
   const [newReview, setNewReview] = useState("");
-  const [rating, setRating] = useState<number | null>(null); // Adicione um estado para o rating
+  const [rating, setRating] = useState<number | null>(null); 
+  const [albumReviews, setAlbumReviews] = useState<any[]>([]); 
   const params = useParams();
   const name = params.name as string;
-  
+  const albumId = Number(params.id);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -86,20 +89,67 @@ export default function AlbumPage() {
   }, [name]);
 
   useEffect(() => {
-    if (!album) return; // Add a guard clause to avoid executing this hook before `album` is available
+    if (!album) return;
 
-    const socket = new WebSocket(`ws://localhost:8000/ws/reviews/${album!.id}/`);
-    console.log("id", album!.id)
+    console.log("Current album:", album);
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setReviews((prevReviews) => [...prevReviews, data.review]);
+    const loadAlbumReviews = async () => {
+      try {
+        const reviews = await FetchAlbumReviews(album.id);
+        setAlbumReviews(reviews); 
+      } catch (error) {
+        console.error("Error fetching album reviews:", error);
+        setError("Failed to load reviews. Please try again.");
+      }
     };
+    loadAlbumReviews(); 
+  }, [album]);
 
+  useEffect(() => {
+    if (!album) return;
+  
+    console.log(`Attempting to connect to WebSocket for album ID: ${album.id}`);
+    const socket = new WebSocket(`ws://localhost:8000/ws/reviews/${album.id}/`);
+  
+    socket.onopen = () => {
+      console.log(`WebSocket connection established for album ID: ${album.id}`);
+    };
+  
+    socket.onmessage = (event) => {
+      console.log(`Received message from WebSocket for album ID ${album.id}:`, event.data);
+      try {
+        const data = JSON.parse(event.data);
+        setAlbumReviews((prevReviews) => [...prevReviews, data.review]);
+      } catch (error) {
+        console.error(`Error parsing WebSocket message for album ID ${album.id}:`, error);
+      }
+    };
+  
+    socket.onerror = (error) => {
+      console.error(`WebSocket error for album ID ${album.id}:`, error);
+    };
+  
+    socket.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(`WebSocket connection closed cleanly for album ID ${album.id}, code=${event.code}, reason=${event.reason}`);
+      } else {
+        console.error(`WebSocket connection died for album ID ${album.id}, code=${event.code}`);
+      }
+    };
+  
+    const reconnectInterval = setInterval(() => {
+      if (socket.readyState === WebSocket.CLOSED) {
+        console.log(`Attempting to reconnect WebSocket for album ID ${album.id}...`);
+        const newSocket = new WebSocket(`ws://localhost:8000/ws/reviews/${album.id}/`);
+        // Handle the new socket connection...
+      }
+    }, 5000);
+  
     return () => {
+      clearInterval(reconnectInterval);
       socket.close();
     };
-  }, [album]); // Ensure this effect only runs when `album` is available
+  }, [album]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,11 +157,24 @@ export default function AlbumPage() {
       console.error("User ID is not available");
       return;
     }
-    const success = await handleReviewSubmit(album!.id, userId, newReview, rating); // Adicione o rating aqui
+    const success = await handleReviewSubmit(album!.id, userId, newReview, rating); 
     if (success) {
-      setNewReview(""); // Limpa o campo de entrada após o envio
-      setRating(null); // Limpa o rating após o envio
+      setNewReview(""); 
+      setRating(null); 
+      if (album) {
+        try {
+          const reviews = await FetchAlbumReviews(album.id);
+          setAlbumReviews(reviews); 
+        } catch (error) {
+          console.error("Error fetching album reviews:", error);
+          setError("Failed to load reviews. Please try again.");
+        }
+      }
     }
+  };
+
+  const handlePlayAudio = () => {
+    // Logic to play audio, ensuring it's called after user interaction
   };
 
   if (error)
@@ -210,9 +273,22 @@ export default function AlbumPage() {
       <div className={styles["reviews-section"]}>
         <h3>Reviews</h3>
         <ul>
-          {reviews.map((review, index) => (
-            <li key={index}>{review}</li>
-          ))}
+          {albumReviews.length > 0 ? (
+            albumReviews.map((review: Review, index) => (
+              <li key={index} className={styles.reviewItem}>
+                {review.user_picture && (
+                  <img
+                    src={review.user_picture}
+                    alt={review.user_name}
+                    className={styles.userImage}
+                  />
+                )}
+                <strong>{review.user_name}</strong>: {review.review} (Rating: {review.rating})
+              </li>
+            ))
+          ) : (
+            <p>No reviews available for this album.</p>
+          )}
         </ul>
         <form onSubmit={handleSubmit} className={styles["review-form"]}>
           <input

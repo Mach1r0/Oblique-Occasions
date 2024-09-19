@@ -145,8 +145,6 @@ class UnfollowArtistView(APIView):
         follow.delete()
         return Response({"message": f"You have unfollowed {artist.user.name}"}, status=status.HTTP_200_OK)
 
-
-
 class UnfollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -262,4 +260,4 @@ class UserReviewViewset(viewsets.ModelViewSet):
         album = get_object_or_404(Album, id=album_id) 
         queryset = Review.objects.filter(album=album)
         serializer = UserReviewSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)  
+        return Response(serializer.data, status=status.HTTP_200_OK)
