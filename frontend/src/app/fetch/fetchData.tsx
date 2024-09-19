@@ -10,7 +10,7 @@ export interface Review {
   id: number;          
   userId: number;  
   albumId: number;    
-  review: string;
+  Review: string;
 }
 
 export async function fetchAlbums() {
@@ -21,7 +21,7 @@ export async function fetchAlbums() {
     }
     const data = await response.json();
     console.log("Fetched albums data:", data);
-    return data;
+  return data;
   } catch (error) {
     console.error("Error fetching albums:", error);
     throw error;
@@ -232,20 +232,20 @@ export const handleFollow = async (artistId: number) => {
   }
 };
 
-export const handleReviewSubmit = async (albumId: number, userId: number, review: string) => {
+export const handleReviewSubmit = async (albumId: number, userId: number, review: string, rating: number) => {
   try {
     const token = localStorage.getItem('token'); 
     if (!token) {
       alert("You need to be logged in to submit a review");
       return false; 
     }
-    const response = await fetch(`http://localhost:8000/api/user/review/${userId}/${albumId}/`, {  // Updated URL
+    const response = await fetch(`http://localhost:8000/api/user/review/${userId}/${albumId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ review }) 
+      body: JSON.stringify({ review, rating }) // Inclua o rating aqui
     });
 
     if (!response.ok) {

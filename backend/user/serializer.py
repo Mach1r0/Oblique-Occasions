@@ -16,13 +16,14 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class UserReviewSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    album = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'album', 'review', 'rating']  # Certifique-se de incluir todos os campos necessários
 
-    class Meta: 
-        model = Review 
-        fields = ['id', 'user', 'album', 'rating', 'content', 'created_at']
+    def create(self, validated_data):
+        return Review.objects.create(**validated_data)
 
+        
 class RegisterSerializer(serializers.ModelSerializer): 
     email =  serializers.EmailField(required=True)
     username = serializers.CharField(required=True) 

@@ -237,21 +237,26 @@ class UserReviewViewset(viewsets.ModelViewSet):
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def create(self, request, user_id, album_id):  
+        logger.info("Received data for review creation:", request.data) 
         permission_classes = [IsAuthenticated]
         
         try:
             album = Album.objects.get(id=album_id)
             user = User.objects.get(id=user_id)  
             serializer = UserReviewSerializer(data=request.data)
+            logger.info("Received data for review creation:", request.data)
             if serializer.is_valid():
                 serializer.save(user=user, album=album)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Album.DoesNotExist:
+            return Response({"message": "Album not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            logger.error(f"Error creating review: {str(e)}") 
             return Response({"message": "Internal error", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
+                        
 
     def listAlbumReviews(self, request, album_id):
         album = get_object_or_404(Album, id=album_id) 

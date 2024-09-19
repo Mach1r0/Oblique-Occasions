@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/app/Context/AuthContext"; // Importe o contexto de autenticação
 import React from "react";
 import {
   fetchAlbum,
   fetchArtist,
   fetchArtistAlbums,
+  handleReviewSubmit,
 } from "@/app/fetch/fetchData";
 import { useParams } from "next/navigation";
 import styles from "../../style/Album.module.css";
@@ -44,15 +46,18 @@ interface RelatedAlbum {
 }
 
 export default function AlbumPage() {
+  const { user } = useAuth(); // Use o contexto para obter o usuário
+  const userId = user?.id; // Obtenha o userId do objeto user
   const [album, setAlbum] = useState<Album | null>(null);
   const [artist, setArtist] = useState<Artist | null>(null);
   const [artistAlbums, setArtistAlbums] = useState<RelatedAlbum[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<string[]>([]); // Move state hooks to the top
   const [newReview, setNewReview] = useState("");
+  const [rating, setRating] = useState<number | null>(null); // Adicione um estado para o rating
   const params = useParams();
   const name = params.name as string;
-
+  
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -83,7 +88,8 @@ export default function AlbumPage() {
   useEffect(() => {
     if (!album) return; // Add a guard clause to avoid executing this hook before `album` is available
 
-    const socket = new WebSocket(`ws://localhost:8000/ws/reviews/${album.id}/`);
+    const socket = new WebSocket(`ws://localhost:8000/ws/reviews/${album!.id}/`);
+    console.log("id", album!.id)
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -95,15 +101,17 @@ export default function AlbumPage() {
     };
   }, [album]); // Ensure this effect only runs when `album` is available
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const socket = new WebSocket(
-      `ws://localhost:8000/ws/reviews/${album!.id}/`
-    ); // Use non-null assertion or check for `album` validity
-    socket.onopen = () => {
-      socket.send(JSON.stringify({ review: newReview }));
-      setNewReview("");
-    };
+    if (!userId) {
+      console.error("User ID is not available");
+      return;
+    }
+    const success = await handleReviewSubmit(album!.id, userId, newReview, rating); // Adicione o rating aqui
+    if (success) {
+      setNewReview(""); // Limpa o campo de entrada após o envio
+      setRating(null); // Limpa o rating após o envio
+    }
   };
 
   if (error)
@@ -213,6 +221,16 @@ export default function AlbumPage() {
             onChange={(e) => setNewReview(e.target.value)}
             placeholder="Write a review..."
             className={styles["review-input"]}
+          />
+          <input
+            type="number"
+            value={rating || ''}
+            onChange={(e) => setRating(Number(e.target.value))}
+            placeholder="Rate (1-5)"
+            className={styles["rating-input"]}
+            min={1}
+            max={5}
+            required 
           />
           <button type="submit" className={styles["submit-button"]}>
             Submit

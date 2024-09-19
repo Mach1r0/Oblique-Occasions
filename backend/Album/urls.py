@@ -7,7 +7,6 @@ from user.views import UserReviewViewset
 router = DefaultRouter()
 router.register(r'', AlbumViewSet, basename='create')
 
-
 urlpatterns = [
     path('', include(router.urls)), 
     path('AlbumsReviewList/<int:album_id>/', UserReviewViewset.as_view({'get': 'listAlbumReviews'}), name='AlbumReviewList')

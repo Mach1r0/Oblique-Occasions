@@ -66,9 +66,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.text import slugify
 
 class Review(models.Model):
-    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='user_reviews')  # Usar string
-    album = models.ForeignKey('Album.Album', on_delete=models.CASCADE, related_name='album_reviews')  # Usar string
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='user_reviews')
+    album = models.ForeignKey('Album.Album', on_delete=models.CASCADE, related_name='album_reviews')
     created_at = models.DateTimeField(auto_now=True)
+    review = models.CharField(max_length=500)  
     rating = models.IntegerField()
 
     def __str__(self):
